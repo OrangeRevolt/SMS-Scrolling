@@ -1,0 +1,77 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80 / R800)                          Page 1
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000000 L
+    _ROM_bank_to_be_mapped_on_slot0                             =  00FFFD G
+    _ROM_bank_to_be_mapped_on_slot1                             =  00FFFE G
+    _ROM_bank_to_be_mapped_on_slot2                             =  00FFFF G
+    _SMS_SRAM                                                   =  008000 G
+    _SMS_VDPControlPort                                         =  0000BF 
+    _SMS_VDPturnOffFeature                                         ****** GX
+    _SMS_VDPturnOnFeature                                          ****** GX
+    _SMS_VRAMmemcpy                                                ****** GX
+    _SMS_VRAMmemsetW                                               ****** GX
+    _SMS_configureTextRenderer                                     ****** GX
+    _SMS_copySpritestoSAT                                          ****** GX
+    _SMS_getKeysHeld                                               ****** GX
+    _SMS_initSprites                                               ****** GX
+    _SMS_loadBGPalette                                             ****** GX
+    _SMS_loadPSGaidencompressedTilesatAddr                         ****** GX
+    _SMS_loadSpritePalette                                         ****** GX
+    _SMS_setBGScrollX                                              ****** GX
+    _SMS_setBGScrollY                                              ****** GX
+    _SMS_setBackdropColor                                          ****** GX
+    _SMS_waitForVBlank                                             ****** GX
+    _SMS_zeroBGPalette                                             ****** GX
+    _SMS_zeroSpritePalette                                         ****** GX
+    _SRAM_bank_to_be_mapped_on_slot2                            =  00FFFC G
+  A ___SMS__SDSC_author                                            007FD3 GR
+  C ___SMS__SDSC_descr                                             007FA9 GR
+  B ___SMS__SDSC_name                                              007FC9 GR
+  D ___SMS__SDSC_signature                                         007FE0 GR
+  9 ___SMS__SEGA_signature                                         007FF0 GR
+  0 __str_0                                                        000B28 R
+  0 __str_1                                                        000B35 R
+  0 __str_2                                                        000B3F R
+  7 __xinit__order_time                                            000000 R
+    _bg_pal_bin                                                    ****** GX
+    _brawl_street_tilemap_bin                                      ****** GX
+    _brawl_street_tiles_psgcompr                                   ****** GX
+  0 _cam_pan_down                                                  00067F GR
+  0 _cam_pan_left                                                  000275 GR
+  0 _cam_pan_right                                                 000070 GR
+  0 _cam_pan_up                                                    000469 GR
+  1 _camera                                                        000000 GR
+    _font_8x8_psgcompr                                             ****** GX
+  0 _init_camera                                                   000000 GR
+  0 _main                                                          0008A6 GR
+  2 _order_time                                                    000000 GR
+  0 _redraw_stage                                                  00002E GR
+    _spr_pal_bin                                                   ****** GX
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80 / R800)                          Page 2
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size    B5F   flags    0
+   1 _DATA                                      size      C   flags    0
+   2 _INITIALIZED                               size      2   flags    0
+   3 _DABS                                      size      0   flags    8
+   4 _HOME                                      size      0   flags    0
+   5 _GSINIT                                    size      0   flags    0
+   6 _GSFINAL                                   size      0   flags    0
+   7 _INITIALIZER                               size      2   flags    0
+   8 _CABS                                      size      0   flags    8
+   9 _CABS0                                     size     10   flags    8
+   A _CABS1                                     size      D   flags    8
+   B _CABS2                                     size      A   flags    8
+   C _CABS3                                     size     20   flags    8
+   D _CABS4                                     size     10   flags    8
+

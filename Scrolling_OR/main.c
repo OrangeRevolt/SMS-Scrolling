@@ -14,7 +14,6 @@
 #include "libs/SMSlib.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include "bank3.h"
 
 #define RIGHT           0 //defines for camera panning direction.
@@ -227,46 +226,46 @@ void cam_pan_down(void)
 { 
      
     camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register in tiles.
-
-
-    if (camera.view_y < 24)
+    
+    if (camera.view_y < 24) //Prvent the scrolling from going past the height of the map. 24 tiles = 192 pixels
     {
         camera.scroll_y++;
     }
     
-    if (camera.scroll_y > 223)
+    if (camera.scroll_y > 223) //We need to reset the scroll_y to prevent it from hitching the screen, from overflow.
     {
         camera.scroll_y = 0;
     }
-    if (camera.scroll_y % 8 == 0 && camera.view_y < 24)
+
+    if (camera.scroll_y % 8 == 0 && camera.view_y < 24) //Time to update the row with tiles. Happens every 1 tile of scrolling. 8 x 8 pixels = 1 tile.
     {
 
-        if (camera.coloffset == 0)
+        if (camera.coloffset == 0) //The screen is not offset horizontally, so no need to split the drawing.
         {
             for (unsigned char x = 0; x < 32; x ++)
             {
                 SMS_loadTileMap(camera.coloffset + x,-camera.rowoffset + 28,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
             }
         }
-        else if (camera.coloffset != 0 && camera.view_y < 23)
+        else if (camera.coloffset != 0 && camera.view_y < 23) //The screen is offset, so we need to split the drawing.
         {
-            camera.rowoffset = (camera.scroll_y / 8) - 1;
+            camera.rowoffset = (camera.scroll_y / 8) - 1; //update row offset for going down.
             for (unsigned char x = 0; x < 32; x++)
             {
-                if (x < 32 - camera.coloffset)
+                if (x < 32 - camera.coloffset) //Place tiles up on the right side of the screen until the end, minus by how much the screen is scrolled in tiles.
                 {
                     SMS_loadTileMap(camera.coloffset + x,camera.rowoffset,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
                 }
-                else
+                else //Once the loop reaches the end of the offset, we need to substract 32 so that coloffset starts back at 0 to finish drawing the row on the left side that remains.
                 {
                     SMS_loadTileMap(camera.coloffset - 32 + x,camera.rowoffset,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
                 }
 
             }
         }
-        camera.view_y++;
+        camera.view_y++; //Increase the view_y by 1.
     }
-    if (camera.rowoffset == 28)
+    if (camera.rowoffset == 28) //Reset rowoffset because the nametable(the tilemap table in VRAM) only has 28 tiles in height (256 x 224. the 32 extra pixels in height is cropped in NTSC resolution..)
     {
         camera.rowoffset = 0;
     }
@@ -274,11 +273,12 @@ void cam_pan_down(void)
 }
 
 
-int order_time = 0;
+
 void main(void)
 {
     //Do initial setup.
     SMS_displayOff();
+
     // Clear VRAM
     SMS_VRAMmemsetW(0, 0x0000, 16384);
     SMS_zeroBGPalette();
@@ -287,10 +287,12 @@ void main(void)
     //Turn on blanking of the first column to do scrolling.
     SMS_VDPturnOnFeature(VDPFEATURE_LEFTCOLBLANK);
     SMS_VDPturnOnFeature(VDPFEATURE_HIDEFIRSTCOL);
+
     //Load the palettes.
     SMS_mapROMBank(bg_pal_bin_bank);
     SMS_loadBGPalette(bg_pal_bin);
     SMS_loadSpritePalette(spr_pal_bin);
+
     //Set the backdrop color to black.
     SMS_setBackdropColor(15);
 
@@ -314,7 +316,8 @@ void main(void)
 
     for(;;)
     {   
-        //Inputs
+        //These are inputs to control the camera for scrolling demonstration. You change this to work with how your game plays..
+        //First we check the diagonal directions.
         if ((SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && (SMS_getKeysHeld() & PORT_A_KEY_DOWN) && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && camera.view_x < 130 && camera.view_y < 24)
         {
             camera.pan_dir = DOWN_RIGHT;
@@ -341,42 +344,43 @@ void main(void)
         }
         else
         {
-            if (camera.pan_dir == DOWN_LEFT || camera.pan_dir == DOWN_RIGHT || camera.pan_dir == UP_LEFT || camera.pan_dir == UP_RIGHT)
+            if (camera.pan_dir > DOWN) //Reset the variable so the single buttons held statements bellow can now fire.
             {
                 camera.pan_dir = -1;
             }
         }
-
-        if (SMS_getKeysHeld() & PORT_A_KEY_RIGHT && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && !(SMS_getKeysHeld() & PORT_A_KEY_DOWN) && camera.pan_dir != DOWN_RIGHT && camera.pan_dir != DOWN_LEFT && camera.pan_dir != UP_RIGHT && camera.pan_dir != UP_LEFT)
+        //Then we check the four cardinal directions. We seperate them so the user can only hold one direction button at a time for 4-way movement.
+        if (SMS_getKeysHeld() & PORT_A_KEY_RIGHT && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && !(SMS_getKeysHeld() & PORT_A_KEY_DOWN) && camera.pan_dir <= DOWN)
         {
             camera.pan_dir = RIGHT;
             cam_pan_right();
         }
-        else if (SMS_getKeysHeld() & PORT_A_KEY_LEFT && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && !(SMS_getKeysHeld() & PORT_A_KEY_DOWN) && camera.pan_dir != DOWN_RIGHT && camera.pan_dir != DOWN_LEFT && camera.pan_dir != UP_RIGHT && camera.pan_dir != UP_LEFT )
+        else if (SMS_getKeysHeld() & PORT_A_KEY_LEFT && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && !(SMS_getKeysHeld() & PORT_A_KEY_DOWN) && camera.pan_dir <= DOWN)
         {
             camera.pan_dir = LEFT;
             cam_pan_left();
         }  
-        else if (SMS_getKeysHeld() & PORT_A_KEY_UP && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && camera.pan_dir != DOWN_RIGHT && camera.pan_dir != DOWN_LEFT && camera.pan_dir != UP_RIGHT && camera.pan_dir != UP_LEFT)
+        else if (SMS_getKeysHeld() & PORT_A_KEY_UP && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && camera.pan_dir <= DOWN)
         {
             camera.pan_dir = UP;
             cam_pan_up();
         }
-        else if (SMS_getKeysHeld() & PORT_A_KEY_DOWN && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && camera.pan_dir != DOWN_RIGHT && camera.pan_dir != DOWN_LEFT && camera.pan_dir != UP_RIGHT && camera.pan_dir != UP_LEFT)
+        else if (SMS_getKeysHeld() & PORT_A_KEY_DOWN && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && camera.pan_dir <= DOWN)
         {
             camera.pan_dir = DOWN;
             cam_pan_down();
         }         
         SMS_waitForVBlank();
-        //Updates the scrolling
+        //Updates the scrolling after vblank. 
         SMS_setBGScrollX(camera.scroll_x);
         SMS_setBGScrollY(camera.scroll_y);
         SMS_initSprites();
+        //Here is where you would update your sprites..
         SMS_copySpritestoSAT();
     }
 
 }
 
-//Header info needed to use rom on a real Sega Master System.
+//Header info needed to use the rom on a real Sega Master System.
 SMS_EMBED_SEGA_ROM_HEADER(9999,0);
 SMS_EMBED_SDSC_HEADER_AUTO_DATE(1,0,"OrangeRevolt","Scrolling","8 way smooth scrolling example.");

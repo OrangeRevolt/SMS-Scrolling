@@ -95,7 +95,7 @@ void cam_pan_right(void)
             for (unsigned char y = 0; y < 28; y++)
             {
                 
-                if (y < 28 - (camera.scroll_y / 8)) 
+                if (y < 28 - camera.rowoffset) //28 - (camera.scroll_y / 8)
                 {
                     SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x + 64) + (((y + camera.view_y) * 96) * 2),2);
                 }
@@ -134,7 +134,6 @@ void cam_pan_left(void)
     {
         camera.coloffset = 0;
     }
-    //value_to_str_print(6,1, camera.coloffset);  
 
     if (camera.scroll_x % 8 == 0 && camera.view_x > 0)
     {
@@ -151,7 +150,7 @@ void cam_pan_left(void)
             for (unsigned char y = 0; y < 28; y++)
             {
                 
-                if (y < 28 - (camera.scroll_y / 8)) 
+                if (y < 28 - camera.rowoffset)  //y < 28 - (camera.scroll_y / 8)
                 {
                     SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);
                 }
@@ -177,11 +176,8 @@ void cam_pan_up(void)
     }
 
 
-
     if (camera.scroll_y % 8 == 0 && camera.view_y > 0)
     {
-        //SMS_printatXY(6,1,"   ");
-        //value_to_str_print(6,1, camera.rowoffset);  
 
         if (camera.coloffset == 0)
         {

@@ -26,8 +26,8 @@
 #define UP_LEFT         6
 #define UP_RIGHT        7
 
-#define CAM_START_X     0 //defines for start position of camera.
-#define CAM_START_Y     0
+#define CAM_START_X     64 //defines for start position of camera.
+#define CAM_START_Y     24
 
 //Create a struct to store all variables related to scrolling. We are using doing variable naming in relation to a camera.
 struct View {
@@ -306,11 +306,12 @@ void main(void)
     //Load the tilemap.
     SMS_mapROMBank(brawl_street_tiles_psgcompr_bank);
     SMS_loadPSGaidencompressedTiles(brawl_street_tiles_psgcompr,0);
-    redraw_stage(); //Draw map at current view position.
+    
 
     //Init the game camera struct.
     init_camera();
-   
+    redraw_stage(); //Draw map at current view position.
+
     //Turn the display on.
     SMS_displayOn();
 

@@ -29,8 +29,8 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000000  s__HEADER3                      
      00000000  s__HEADER4                      
      00000001  l__GSFINAL                      
-     00000007  l__INITIALIZED                  
-     00000007  l__INITIALIZER                  
+     00000005  l__INITIALIZED                  
+     00000005  l__INITIALIZER                  
      00000008  l__HEADER0                      
      00000009  l__HEADER1                      
      0000000A  l__CABS2                        
@@ -41,21 +41,21 @@ Area                                    Addr        Size        Decimal Bytes (A
      0000001F  l__HEADER2                      
      00000020  l__CABS3                        
      0000002B  l__HEADER3                      
-     000000FB  l__DATA                         
+     000000F9  l__DATA                         
      00000104  l__HEADER4                      
      00000200  s__CODE                         
-     00000F26  l__CODE                         
-     00001126  s__HOME                         
-     00001126  s__INITIALIZER                  
-     0000112D  s__GSINIT                       
-     0000113C  s__GSFINAL                      
+     000009BB  l__CODE                         
+     00000BBB  s__HOME                         
+     00000BBB  s__INITIALIZER                  
+     00000BC0  s__GSINIT                       
+     00000BCF  s__GSFINAL                      
      0000348E  l__BANK3                        
      00008000  _SMS_SRAM                          SMSlib_VRAMmemcpy
      0000C000  s__DATA                         
-     0000C0FB  s__INITIALIZED                  
-     0000C102  s__BSEG                         
-     0000C102  s__BSS                          
-     0000C102  s__HEAP                         
+     0000C0F9  s__INITIALIZED                  
+     0000C0FE  s__BSEG                         
+     0000C0FE  s__BSS                          
+     0000C0FE  s__HEAP                         
      0000FFFC  _SRAM_bank_to_be_mapped_on_slot2   SMSlib_VRAMmemcpy
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
@@ -75,59 +75,59 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_CODE                               00000200    00000F26 =        3878. bytes (REL,CON)
+_CODE                               00000200    000009BB =        2491. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
      00000200  _init_camera                       main
-     0000022E  _redraw_stage                      main
-     00000270  _cam_pan_right                     main
-     00000475  _cam_pan_left                      main
-     00000669  _cam_pan_up                        main
-     0000087F  _cam_pan_down                      main
-     00000AA6  _main                              main
-     00000D5F  _SMS_loadPSGaidencompressedTiles   SMSlib_PSGaiden
-     00000E30  _SMS_VRAMmemset_f                  SMSlib_VRAMmemset
-     00000E4C  _SMS_VRAMmemsetW                   SMSlib_VRAMmemset
-     00000E5F  _SMS_loadBGPaletteHalfBrightness   SMSlib_paletteAdv
-     00000E76  _SMS_zeroBGPalette                 SMSlib_paletteAdv
-     00000E8A  _SMS_loadSpritePaletteHalfBright   SMSlib_paletteAdv
-     00000EA1  _SMS_zeroSpritePalette             SMSlib_paletteAdv
-     00000EB5  _SMS_init                          SMSlib
-     00000EE1  _VDPReg_init                       SMSlib
-     00000EEC  _SMS_VDPturnOnFeature              SMSlib
-     00000F01  _SMS_VDPturnOffFeature             SMSlib
-     00000F19  _SMS_setBGScrollX                  SMSlib
-     00000F23  _SMS_setBGScrollY                  SMSlib
-     00000F2D  _SMS_setBackdropColor              SMSlib
-     00000F37  _SMS_useFirstHalfTilesforSprites   SMSlib
-     00000F4D  _SMS_setSpriteMode                 SMSlib
-     00000F9A  _SMS_setBGPaletteColor             SMSlib
-     00000FA7  _SMS_setSpritePaletteColor         SMSlib
-     00000FB4  _SMS_loadBGPalette                 SMSlib
-     00000FC8  _SMS_loadSpritePalette             SMSlib
-     00000FDC  _SMS_setColor                      SMSlib
-     00000FE0  _SMS_waitForVBlank                 SMSlib
-     00000FED  _SMS_getKeysStatus                 SMSlib
-     00000FF2  _SMS_getKeysPressed                SMSlib
-     00001007  _SMS_getKeysHeld                   SMSlib
-     0000101A  _SMS_getKeysReleased               SMSlib
-     00001033  _SMS_queryPauseRequested           SMSlib
-     00001037  _SMS_resetPauseRequest             SMSlib
-     0000103D  _SMS_setFrameInterruptHandler      SMSlib
-     00001041  _SMS_setLineInterruptHandler       SMSlib
-     00001045  _SMS_setLineCounter                SMSlib
-     0000104F  _SMS_getVCount                     SMSlib
-     00001052  _SMS_getHCount                     SMSlib
-     00001055  _SMS_isr                           SMSlib
-     00001094  _SMS_nmi_isr                       SMSlib
-     0000109D  _SMS_configureTextRenderer         SMSlib_textrenderer
-     000010A1  _putchar                           SMSlib_textrenderer
-     000010A9  _SMS_initSprites                   SMSlib_sprite
-     000010AF  _SMS_addSprite_f                   SMSlib_sprite
-     000010DA  _SMS_copySpritestoSAT              SMSlib_sprite
-     0000110E  ___sdcc_call_hl                    
-     0000110F  _SMS_VRAMmemcpy                    SMSlib_VRAMmemcpy
+     00000228  _redraw_stage                      main
+     0000026A  _cam_pan_right                     main
+     000003A9  _cam_pan_left                      main
+     000004CA  _cam_pan_up                        main
+     000005F5  _cam_pan_down                      main
+     0000071A  _main                              main
+     000007F4  _SMS_loadPSGaidencompressedTiles   SMSlib_PSGaiden
+     000008C5  _SMS_VRAMmemset_f                  SMSlib_VRAMmemset
+     000008E1  _SMS_VRAMmemsetW                   SMSlib_VRAMmemset
+     000008F4  _SMS_loadBGPaletteHalfBrightness   SMSlib_paletteAdv
+     0000090B  _SMS_zeroBGPalette                 SMSlib_paletteAdv
+     0000091F  _SMS_loadSpritePaletteHalfBright   SMSlib_paletteAdv
+     00000936  _SMS_zeroSpritePalette             SMSlib_paletteAdv
+     0000094A  _SMS_init                          SMSlib
+     00000976  _VDPReg_init                       SMSlib
+     00000981  _SMS_VDPturnOnFeature              SMSlib
+     00000996  _SMS_VDPturnOffFeature             SMSlib
+     000009AE  _SMS_setBGScrollX                  SMSlib
+     000009B8  _SMS_setBGScrollY                  SMSlib
+     000009C2  _SMS_setBackdropColor              SMSlib
+     000009CC  _SMS_useFirstHalfTilesforSprites   SMSlib
+     000009E2  _SMS_setSpriteMode                 SMSlib
+     00000A2F  _SMS_setBGPaletteColor             SMSlib
+     00000A3C  _SMS_setSpritePaletteColor         SMSlib
+     00000A49  _SMS_loadBGPalette                 SMSlib
+     00000A5D  _SMS_loadSpritePalette             SMSlib
+     00000A71  _SMS_setColor                      SMSlib
+     00000A75  _SMS_waitForVBlank                 SMSlib
+     00000A82  _SMS_getKeysStatus                 SMSlib
+     00000A87  _SMS_getKeysPressed                SMSlib
+     00000A9C  _SMS_getKeysHeld                   SMSlib
+     00000AAF  _SMS_getKeysReleased               SMSlib
+     00000AC8  _SMS_queryPauseRequested           SMSlib
+     00000ACC  _SMS_resetPauseRequest             SMSlib
+     00000AD2  _SMS_setFrameInterruptHandler      SMSlib
+     00000AD6  _SMS_setLineInterruptHandler       SMSlib
+     00000ADA  _SMS_setLineCounter                SMSlib
+     00000AE4  _SMS_getVCount                     SMSlib
+     00000AE7  _SMS_getHCount                     SMSlib
+     00000AEA  _SMS_isr                           SMSlib
+     00000B29  _SMS_nmi_isr                       SMSlib
+     00000B32  _SMS_configureTextRenderer         SMSlib_textrenderer
+     00000B36  _putchar                           SMSlib_textrenderer
+     00000B3E  _SMS_initSprites                   SMSlib_sprite
+     00000B44  _SMS_addSprite_f                   SMSlib_sprite
+     00000B6F  _SMS_copySpritestoSAT              SMSlib_sprite
+     00000BA3  ___sdcc_call_hl                    
+     00000BA4  _SMS_VRAMmemcpy                    SMSlib_VRAMmemcpy
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 4.
 Hexadecimal  [32-Bits]
@@ -189,7 +189,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_INITIALIZER                        00001126    00000007 =           7. bytes (REL,CON)
+_INITIALIZER                        00000BBB    00000005 =           5. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -198,18 +198,18 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_GSINIT                             0000112D    0000000F =          15. bytes (REL,CON)
+_GSINIT                             00000BC0    0000000F =          15. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     0000112D  gsinit                             crt0
+     00000BC0  gsinit                             crt0
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 11.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_GSFINAL                            0000113C    00000001 =           1. bytes (REL,CON)
+_GSFINAL                            00000BCF    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -218,39 +218,38 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_DATA                               0000C000    000000FB =         251. bytes (REL,CON)
+_DATA                               0000C000    000000F9 =         249. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
      0000C000  _camera                            main
-     0000C00C  _decompBuffer                      SMSlib_PSGaiden
-     0000C02C  _VDPBlank                          SMSlib
-     0000C02D  _SMS_VDPFlags                      SMSlib
-     0000C02E  _PauseRequested                    SMSlib
-     0000C02F  _SMS_Port3EBIOSvalue               SMSlib
-     0000C030  _SMS_theFrameInterruptHandler      SMSlib
-     0000C032  _KeysStatus                        SMSlib
-     0000C034  _PreviousKeysStatus                SMSlib
-     0000C036  _SMS_theLineInterruptHandler       SMSlib
-     0000C038  _SMS_TextRenderer_offset           SMSlib_textrenderer
-     0000C03A  _SpriteTableY                      SMSlib_sprite
-     0000C07A  _SpriteTableXN                     SMSlib_sprite
-     0000C0FA  _SpriteNextFree                    SMSlib_sprite
+     0000C00A  _decompBuffer                      SMSlib_PSGaiden
+     0000C02A  _VDPBlank                          SMSlib
+     0000C02B  _SMS_VDPFlags                      SMSlib
+     0000C02C  _PauseRequested                    SMSlib
+     0000C02D  _SMS_Port3EBIOSvalue               SMSlib
+     0000C02E  _SMS_theFrameInterruptHandler      SMSlib
+     0000C030  _KeysStatus                        SMSlib
+     0000C032  _PreviousKeysStatus                SMSlib
+     0000C034  _SMS_theLineInterruptHandler       SMSlib
+     0000C036  _SMS_TextRenderer_offset           SMSlib_textrenderer
+     0000C038  _SpriteTableY                      SMSlib_sprite
+     0000C078  _SpriteTableXN                     SMSlib_sprite
+     0000C0F8  _SpriteNextFree                    SMSlib_sprite
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 13.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_INITIALIZED                        0000C0FB    00000007 =           7. bytes (REL,CON)
+_INITIALIZED                        0000C0F9    00000005 =           5. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     0000C0FB  _order_time                        main
-     0000C0FD  _VDPReg                            SMSlib
-     0000C0FF  _spritesHeight                     SMSlib
-     0000C100  _spritesWidth                      SMSlib
-     0000C101  _spritesTileOffset                 SMSlib
+     0000C0F9  _VDPReg                            SMSlib
+     0000C0FB  _spritesHeight                     SMSlib
+     0000C0FC  _spritesWidth                      SMSlib
+     0000C0FD  _spritesTileOffset                 SMSlib
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 14.
 Hexadecimal  [32-Bits]

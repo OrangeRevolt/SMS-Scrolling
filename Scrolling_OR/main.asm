@@ -37,7 +37,6 @@
 	.globl _SMS_setBGScrollX
 	.globl _SMS_VDPturnOffFeature
 	.globl _SMS_VDPturnOnFeature
-	.globl _order_time
 	.globl _camera
 	.globl _SMS_SRAM
 	.globl _SRAM_bank_to_be_mapped_on_slot2
@@ -58,13 +57,11 @@ _ROM_bank_to_be_mapped_on_slot0	=	0xfffd
 _SRAM_bank_to_be_mapped_on_slot2	=	0xfffc
 _SMS_SRAM	=	0x8000
 _camera::
-	.ds 12
+	.ds 10
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
 	.area _INITIALIZED
-_order_time::
-	.ds 2
 ;--------------------------------------------------------
 ; absolute external ram data
 ;--------------------------------------------------------
@@ -107,30 +104,27 @@ _init_camera::
 	ld	((_camera + 6)), hl
 ;main.c:50: camera.rowoffset = 0;
 	ld	((_camera + 8)), hl
-;main.c:51: camera.pan_dir = -1;
-	ld	hl, #0xffff
-	ld	((_camera + 10)), hl
-;main.c:52: SMS_setBGScrollX(camera.scroll_x);
+;main.c:51: SMS_setBGScrollX(camera.scroll_x);
 	ld	a, (bc)
 	ld	l, a
 ;	spillPairReg hl
 ;	spillPairReg hl
 	call	_SMS_setBGScrollX
-;main.c:53: SMS_setBGScrollY(camera.scroll_y);
+;main.c:52: SMS_setBGScrollY(camera.scroll_y);
 	ld	hl, #(_camera + 5)
 	ld	l, (hl)
 ;	spillPairReg hl
-;main.c:54: }
+;main.c:53: }
 	jp	_SMS_setBGScrollY
-;main.c:55: void redraw_stage(void)
+;main.c:54: void redraw_stage(void)
 ;	---------------------------------
 ; Function redraw_stage
 ; ---------------------------------
 _redraw_stage::
-;main.c:57: SMS_mapROMBank(brawl_street_tilemap_bin_bank);
+;main.c:56: SMS_mapROMBank(brawl_street_tilemap_bin_bank);
 	ld	hl, #_ROM_bank_to_be_mapped_on_slot2
 	ld	(hl), #0x03
-;main.c:58: for(unsigned int y = 0; y < 28; y++) //load the fight stage.
+;main.c:57: for(unsigned int y = 0; y < 28; y++) //load the fight stage.
 	ld	bc, #0x0000
 00103$:
 	ld	a, c
@@ -138,7 +132,7 @@ _redraw_stage::
 	ld	a, b
 	sbc	a, #0x00
 	ret	NC
-;main.c:60: SMS_loadTileMap(0,y,brawl_street_tilemap_bin + camera.view_x + (((y + camera.view_y) * 96) * 2), 64); //96 * 2 == the tilemap width in tiles (3 screens.)
+;main.c:59: SMS_loadTileMap(0,y,brawl_street_tilemap_bin + camera.view_x + (((y + camera.view_y) * 96) * 2), 64); //96 * 2 == the tilemap width in tiles (3 screens.)
 	ld	de, (#_camera + 0)
 	ld	hl, #_brawl_street_tilemap_bin
 	add	hl, de
@@ -177,11 +171,11 @@ _redraw_stage::
 	push	bc
 	call	_SMS_VRAMmemcpy
 	pop	bc
-;main.c:58: for(unsigned int y = 0; y < 28; y++) //load the fight stage.
+;main.c:57: for(unsigned int y = 0; y < 28; y++) //load the fight stage.
 	inc	bc
-;main.c:63: }
+;main.c:62: }
 	jr	00103$
-;main.c:80: void cam_pan_right(void) 
+;main.c:64: void cam_pan_right(void) 
 ;	---------------------------------
 ; Function cam_pan_right
 ; ---------------------------------
@@ -189,116 +183,23 @@ _cam_pan_right::
 	push	ix
 	ld	ix,#0
 	add	ix,sp
-	ld	hl, #-7
+	ld	hl, #-6
 	add	hl, sp
 	ld	sp, hl
-;main.c:83: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
+;main.c:67: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
 	ld	a, (#(_camera + 4) + 0)
 	and	a, #0x07
-;main.c:87: for (unsigned char y = 0; y < 28; y++)
-;main.c:83: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
+;main.c:74: for (unsigned char y = 0; y < 28; y++)
+;main.c:67: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
 	or	a,#0x00
-	jp	NZ, 00112$
-	ld	hl, #_camera
-	ld	a, (hl)
-	ld	-7 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-6 (ix), a
-	ld	a, -7 (ix)
-	sub	a, #0x80
-	ld	a, -6 (ix)
-	sbc	a, #0x00
-	jp	NC, 00112$
-;main.c:85: if (camera.rowoffset == 0) //No offset on the row, so we don't need to split the row code.
-	ld	hl, #(_camera + 8)
-	ld	a, (hl)
-	ld	-2 (ix), a
-	inc	hl
-	ld	a, (hl)
-;main.c:87: for (unsigned char y = 0; y < 28; y++)
-;main.c:85: if (camera.rowoffset == 0) //No offset on the row, so we don't need to split the row code.
-	ld	-1 (ix), a
-	or	a, -2 (ix)
-	jr	NZ, 00109$
-;main.c:87: for (unsigned char y = 0; y < 28; y++)
-	ld	-1 (ix), #0x00
-00121$:
-;main.c:83: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
-	ld	hl, #_camera
-	ld	a, (hl)
-	ld	-7 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-6 (ix), a
-;main.c:87: for (unsigned char y = 0; y < 28; y++)
-	ld	a, -1 (ix)
-	sub	a, #0x1c
-	jp	NC, 00110$
-;main.c:89: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x + 64) + (((y + camera.view_y) * 96) * 2),2);
-	ld	a, -7 (ix)
-	add	a, #0x40
-	ld	c, a
-	ld	a, -6 (ix)
-	adc	a, #0x00
-	ld	b, a
-	ld	hl, #_brawl_street_tilemap_bin
-	add	hl, bc
-	ex	de, hl
-	ld	c, -1 (ix)
-	ld	b, #0x00
-	ld	hl, (#(_camera + 2) + 0)
-	add	hl, bc
-	push	de
-	ld	e, l
-	ld	d, h
-	add	hl, hl
-	add	hl, de
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	pop	de
-	add	hl, de
-	ex	de, hl
-	ld	hl, (#(_camera + 8) + 0)
-	add	hl, bc
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ld	c, l
-	ld	b, h
-	ld	a, (#(_camera + 6) + 0)
-	ld	l, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	h, #0x00
-;	spillPairReg hl
-;	spillPairReg hl
-	add	hl, bc
-	add	hl, hl
-	ld	a, h
-	or	a, #0x78
-	ld	h, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	bc, #0x0002
-	push	bc
-	call	_SMS_VRAMmemcpy
-;main.c:87: for (unsigned char y = 0; y < 28; y++)
-	inc	-1 (ix)
-	jr	00121$
-00109$:
-;main.c:92: else if (camera.rowoffset != 0)
-	ld	a, -1 (ix)
-	or	a, -2 (ix)
-	jp	Z, 00110$
-;main.c:94: camera.rowoffset = (camera.scroll_y / 8);
-	ld	a, (#(_camera + 5) + 0)
+	jp	NZ, 00106$
+	ld	hl, (#_camera + 0)
+	ld	de, #0x0080
+	cp	a, a
+	sbc	hl, de
+	jp	NC, 00106$
+;main.c:69: camera.rowoffset = (camera.scroll_y / 8);
+	ld	a, (#_camera + 5)
 	ld	c, a
 	ld	b, #0x00
 	sra	b
@@ -308,125 +209,65 @@ _cam_pan_right::
 	sra	b
 	rr	c
 	ld	((_camera + 8)), bc
-;main.c:95: for (unsigned char y = 0; y < 28; y++)
+;main.c:71: unsigned char rowoffset = camera.rowoffset; //Save the last state of rowoffset in a temp variable.
+;main.c:72: unsigned char ydex = 0; //We store the current y loop position, in order to subtract from the loop, to start at zero again when at last tile position.
+	ld	-6 (ix), #0x00
+;main.c:74: for (unsigned char y = 0; y < 28; y++)
 	ld	-1 (ix), #0x00
-00124$:
-;main.c:83: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
+00115$:
+;main.c:67: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
 	ld	hl, #_camera
-	ld	a, (hl)
-	ld	-7 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-6 (ix), a
-;main.c:95: for (unsigned char y = 0; y < 28; y++)
-	ld	a, -1 (ix)
-	sub	a, #0x1c
-	jp	NC, 00110$
-;main.c:98: if (y < 28 - (camera.scroll_y / 8)) 
-	ld	a, (#(_camera + 5) + 0)
-	ld	c, a
-	ld	b, #0x00
-	sra	b
-	rr	c
-	sra	b
-	rr	c
-	sra	b
-	rr	c
-	ld	hl, #0x001c
-	cp	a, a
-	sbc	hl, bc
-	ex	de, hl
-	ld	c, -1 (ix)
-	ld	b, #0x00
-;main.c:85: if (camera.rowoffset == 0) //No offset on the row, so we don't need to split the row code.
-	ld	hl, #(_camera + 8)
 	ld	a, (hl)
 	ld	-5 (ix), a
 	inc	hl
 	ld	a, (hl)
 	ld	-4 (ix), a
-;main.c:89: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x + 64) + (((y + camera.view_y) * 96) * 2),2);
-	ld	a, -7 (ix)
-	add	a, #0x40
+;main.c:74: for (unsigned char y = 0; y < 28; y++)
+	ld	a, -1 (ix)
+	sub	a, #0x1c
+	jp	NC, 00104$
+;main.c:76: if (y >= 28 - rowoffset && rowoffset != 0)//When screen is offset, as the loop reaches the edge of the screen, we need to reset the loop so it begins at zero to finish off tiling.
+	ld	e, c
+	ld	d, #0x00
+	ld	hl, #0x001c
+	cp	a, a
+	sbc	hl, de
+	ld	a, -1 (ix)
 	ld	-3 (ix), a
-	ld	a, -6 (ix)
-	adc	a, #0x00
-	ld	-2 (ix), a
-;main.c:98: if (y < 28 - (camera.scroll_y / 8)) 
-	ld	a, c
-	sub	a, e
-	ld	a, b
-	sbc	a, d
-	jp	PO, 00223$
-	xor	a, #0x80
-00223$:
-	jp	P, 00103$
-;main.c:100: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x + 64) + (((y + camera.view_y) * 96) * 2),2);
+	ld	-2 (ix), #0x00
 	ld	a, -3 (ix)
-	add	a, #<(_brawl_street_tilemap_bin)
-	ld	e, a
+	sub	a, l
 	ld	a, -2 (ix)
-	adc	a, #>(_brawl_street_tilemap_bin)
-	ld	d, a
-	ld	hl, (#(_camera + 2) + 0)
-	add	hl, bc
-	push	de
-	ld	e, l
-	ld	d, h
-	add	hl, hl
-	add	hl, de
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	pop	de
-	add	hl, de
-	ex	de, hl
+	sbc	a, h
+	jp	PO, 00189$
+	xor	a, #0x80
+00189$:
+	jp	M, 00102$
+	ld	a, c
+	or	a, a
+	jr	Z, 00102$
+;main.c:78: rowoffset = 0; //removes the offset from the equation. we need to start at zero.
+	ld	c, #0x00
+;main.c:79: ydex = y; //store the y loop current index, to subtract it.
+	ld	a, -1 (ix)
+	ld	-6 (ix), a
+00102$:
+;main.c:81: SMS_loadTileMap(camera.coloffset,rowoffset + (y - ydex),brawl_street_tilemap_bin + (camera.view_x + 64) + (((y + camera.view_y) * 96) * 2),2);
 	ld	l, -5 (ix)
 ;	spillPairReg hl
 ;	spillPairReg hl
 	ld	h, -4 (ix)
 ;	spillPairReg hl
 ;	spillPairReg hl
-	add	hl, bc
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ld	c, l
-	ld	b, h
-	ld	a, (#(_camera + 6) + 0)
-	ld	l, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	h, #0x00
-;	spillPairReg hl
-;	spillPairReg hl
-	add	hl, bc
-	add	hl, hl
-	ld	a, h
-	or	a, #0x78
-	ld	h, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	bc, #0x0002
-	push	bc
-	call	_SMS_VRAMmemcpy
-	jr	00125$
-00103$:
-;main.c:104: SMS_loadTileMap(camera.coloffset,camera.rowoffset - 28 + y,brawl_street_tilemap_bin + (camera.view_x + 64) + (((y + camera.view_y) * 96) * 2),2);
-	ld	a, #<(_brawl_street_tilemap_bin)
-	add	a, -3 (ix)
-	ld	e, a
-	ld	a, #>(_brawl_street_tilemap_bin)
-	adc	a, -2 (ix)
-	ld	d, a
-	ld	hl, (#(_camera + 2) + 0)
-	add	hl, bc
-	push	de
+	ld	de, #0x0040
+	add	hl, de
+	ld	iy, #_brawl_street_tilemap_bin
+	ex	de, hl
+	add	iy, de
+	ld	hl, (#_camera + 2)
+	ld	e, -3 (ix)
+	ld	d, -2 (ix)
+	add	hl, de
 	ld	e, l
 	ld	d, h
 	add	hl, hl
@@ -437,27 +278,31 @@ _cam_pan_right::
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
-	pop	de
-	add	hl, de
 	ex	de, hl
-	ld	a, -5 (ix)
-	add	a, #0xe4
+	add	iy, de
+	ld	e, c
+	ld	d, #0x00
+	ld	l, -6 (ix)
+;	spillPairReg hl
+;	spillPairReg hl
+	ld	b, #0x00
+	ld	a, -3 (ix)
+	sub	a, l
 	ld	l, a
 ;	spillPairReg hl
 ;	spillPairReg hl
-	ld	a, -4 (ix)
-	adc	a, #0xff
+	ld	a, -2 (ix)
+	sbc	a, b
 	ld	h, a
 ;	spillPairReg hl
 ;	spillPairReg hl
-	add	hl, bc
+	add	hl, de
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
-	ld	c, l
-	ld	b, h
+	ex	de,hl
 	ld	a, (#(_camera + 6) + 0)
 	ld	h, #0x00
 ;	spillPairReg hl
@@ -465,50 +310,53 @@ _cam_pan_right::
 	ld	l, a
 ;	spillPairReg hl
 ;	spillPairReg hl
-	add	hl, bc
+	add	hl, de
 	add	hl, hl
 	ld	a, h
 	or	a, #0x78
 	ld	h, a
 ;	spillPairReg hl
 ;	spillPairReg hl
-	ld	bc, #0x0002
 	push	bc
+	ld	de, #0x0002
+	push	de
+	push	iy
+	pop	de
 	call	_SMS_VRAMmemcpy
-00125$:
-;main.c:95: for (unsigned char y = 0; y < 28; y++)
-	inc	-1 (ix)
-	jp	00124$
-00110$:
-;main.c:109: camera.view_x+= 2;
 	pop	bc
-	push	bc
+;main.c:74: for (unsigned char y = 0; y < 28; y++)
+	inc	-1 (ix)
+	jp	00115$
+00104$:
+;main.c:84: camera.view_x+= 2;
+	ld	c, -5 (ix)
+	ld	b, -4 (ix)
 	inc	bc
 	inc	bc
 	ld	(_camera), bc
-00112$:
-;main.c:83: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
+00106$:
+;main.c:67: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
 	ld	hl, (#_camera + 0)
+;main.c:86: if (camera.view_x < 128 || camera.view_x >= 128 && camera.scroll_x % 32 != 0)
 	ld	de, #0x0080
 	cp	a, a
 	sbc	hl, de
 	ld	a, #0x00
 	rla
-;main.c:111: if (camera.view_x < 128 || camera.view_x >= 128 && camera.scroll_x % 32 != 0)
 	or	a, a
-	jr	NZ, 00114$
+	jr	NZ, 00108$
 	ld	c, a
 	bit	0, c
-	jr	NZ, 00115$
+	jr	NZ, 00109$
 	ld	a, (#(_camera + 4) + 0)
 	and	a, #0x1f
-	jr	Z, 00115$
-00114$:
-;main.c:113: camera.scroll_x--;
+	jr	Z, 00109$
+00108$:
+;main.c:88: camera.scroll_x--;
 	ld	a, (#(_camera + 4) + 0)
 	dec	a
 	ld	(#(_camera + 4)),a
-;main.c:114: camera.coloffset = 32 - (camera.scroll_x / 8); //Get the position of the x scroll register in tiles.
+;main.c:89: camera.coloffset = 32 - (camera.scroll_x / 8); //Get the position of the x scroll register in tiles.
 	ld	c, a
 	ld	b, #0x00
 	sra	b
@@ -524,22 +372,22 @@ _cam_pan_right::
 	sub	a, b
 	ld	b, a
 	ld	((_camera + 6)), bc
-00115$:
-;main.c:118: if (camera.coloffset == 32)
+00109$:
+;main.c:93: if (camera.coloffset == 32)
 	ld	hl, (#(_camera + 6) + 0)
 	ld	a, l
 	sub	a, #0x20
 	or	a, h
-	jr	NZ, 00126$
-;main.c:120: camera.coloffset = 0;
+	jr	NZ, 00117$
+;main.c:95: camera.coloffset = 0;
 	ld	hl, #0x0000
 	ld	((_camera + 6)), hl
-00126$:
-;main.c:123: }
+00117$:
+;main.c:98: }
 	ld	sp, ix
 	pop	ix
 	ret
-;main.c:125: void cam_pan_left(void)
+;main.c:100: void cam_pan_left(void)
 ;	---------------------------------
 ; Function cam_pan_left
 ; ---------------------------------
@@ -547,21 +395,21 @@ _cam_pan_left::
 	push	ix
 	ld	ix,#0
 	add	ix,sp
-	ld	hl, #-7
+	ld	hl, #-6
 	add	hl, sp
 	ld	sp, hl
-;main.c:127: if (camera.view_x > 0)
+;main.c:102: if (camera.view_x > 0)
 	ld	hl, (#_camera + 0)
 	ld	a, h
 	or	a, l
 	jr	Z, 00102$
-;main.c:129: camera.scroll_x++;
+;main.c:104: camera.scroll_x++;
 	ld	bc, #_camera+4
 	ld	a, (bc)
 	inc	a
 	ld	(bc), a
 00102$:
-;main.c:132: camera.coloffset = 32 - (camera.scroll_x / 8); //Get the position of the x scroll register in tiles.
+;main.c:107: camera.coloffset = 32 - (camera.scroll_x / 8); //Get the position of the x scroll register in tiles.
 	ld	bc, #_camera + 4
 	ld	a, (bc)
 	ld	e, a
@@ -577,114 +425,25 @@ _cam_pan_left::
 	sbc	hl, de
 	ex	de, hl
 	ld	((_camera + 6)), de
-;main.c:133: if (camera.coloffset == 32)
+;main.c:108: if (camera.coloffset == 32)
 	ld	a, e
 	sub	a, #0x20
 	or	a, d
 	jr	NZ, 00104$
-;main.c:135: camera.coloffset = 0;
+;main.c:110: camera.coloffset = 0;
 	ld	hl, #0x0000
 	ld	((_camera + 6)), hl
 00104$:
-;main.c:139: if (camera.scroll_x % 8 == 0 && camera.view_x > 0)
+;main.c:113: if (camera.scroll_x % 8 == 0 && camera.view_x > 0)
 	ld	a, (bc)
 	and	a, #0x07
-	jp	NZ,00124$
-	ld	hl, #_camera
-	ld	a, (hl)
-	ld	-3 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-2 (ix), a
-	or	a, -3 (ix)
-	jp	Z, 00124$
-;main.c:141: if (camera.rowoffset == 0)
-	ld	hl, #(_camera + 8)
-	ld	a, (hl)
-	ld	-5 (ix), a
-	inc	hl
-	ld	a, (hl)
-;main.c:143: for (unsigned char y = 0; y < 28; y++)
-;main.c:141: if (camera.rowoffset == 0)
-	ld	-4 (ix), a
-	or	a, -5 (ix)
-	jr	NZ, 00113$
-;main.c:143: for (unsigned char y = 0; y < 28; y++)
-	ld	-1 (ix), #0x00
-00119$:
-;main.c:139: if (camera.scroll_x % 8 == 0 && camera.view_x > 0)
-	ld	hl, #_camera
-	ld	a, (hl)
-	ld	-3 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-2 (ix), a
-;main.c:143: for (unsigned char y = 0; y < 28; y++)
-	ld	a, -1 (ix)
-	sub	a, #0x1c
-	jp	NC, 00114$
-;main.c:145: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);
-	ld	c, -3 (ix)
-	ld	b, -2 (ix)
-	dec	bc
-	dec	bc
-	ld	hl, #_brawl_street_tilemap_bin
-	add	hl, bc
-	ex	de, hl
-	ld	c, -1 (ix)
-	ld	b, #0x00
-	ld	hl, (#(_camera + 2) + 0)
-	add	hl, bc
-	push	de
-	ld	e, l
-	ld	d, h
-	add	hl, hl
-	add	hl, de
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	pop	de
-	add	hl, de
-	ex	de, hl
-	ld	hl, (#(_camera + 8) + 0)
-	add	hl, bc
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ld	c, l
-	ld	b, h
-	ld	a, (#(_camera + 6) + 0)
-	ld	l, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	h, #0x00
-;	spillPairReg hl
-;	spillPairReg hl
-	add	hl, bc
-	add	hl, hl
+	jp	NZ,00115$
+	ld	hl, (#_camera + 0)
 	ld	a, h
-	or	a, #0x78
-	ld	h, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	bc, #0x0002
-	push	bc
-	call	_SMS_VRAMmemcpy
-;main.c:143: for (unsigned char y = 0; y < 28; y++)
-	inc	-1 (ix)
-	jr	00119$
-00113$:
-;main.c:148: else if (camera.rowoffset != 0)
-	ld	a, -4 (ix)
-	or	a, -5 (ix)
-	jp	Z, 00114$
-;main.c:150: camera.rowoffset = (camera.scroll_y / 8);
-	ld	a, (#(_camera + 5) + 0)
+	or	a, l
+	jp	Z, 00115$
+;main.c:115: camera.rowoffset = (camera.scroll_y / 8);
+	ld	a, (#_camera + 5)
 	ld	c, a
 	ld	b, #0x00
 	sra	b
@@ -694,121 +453,60 @@ _cam_pan_left::
 	sra	b
 	rr	c
 	ld	((_camera + 8)), bc
-;main.c:151: for (unsigned char y = 0; y < 28; y++)
+;main.c:118: unsigned char rowoffset = camera.rowoffset; //Save the last state of rowoffset in a temp variable.
+;main.c:119: unsigned char ydex = 0; //We store the current y loop position, in order to subtract from the loop, to start at zero again when at last tile position.
+	ld	-6 (ix), #0x00
+;main.c:120: for (unsigned char y = 0; y < 28; y++)
 	ld	-1 (ix), #0x00
-00122$:
-;main.c:139: if (camera.scroll_x % 8 == 0 && camera.view_x > 0)
-	ld	hl, #_camera
-	ld	a, (hl)
-	ld	-3 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-2 (ix), a
-;main.c:151: for (unsigned char y = 0; y < 28; y++)
-	ld	a, -1 (ix)
-	sub	a, #0x1c
-	jp	NC, 00114$
-;main.c:154: if (y < 28 - (camera.scroll_y / 8)) 
-	ld	a, (#(_camera + 5) + 0)
-	ld	c, a
-	ld	b, #0x00
-	sra	b
-	rr	c
-	sra	b
-	rr	c
-	sra	b
-	rr	c
-	ld	a, #0x1c
-	sub	a, c
-	ld	-7 (ix), a
-	sbc	a, a
-	sub	a, b
-	ld	-6 (ix), a
-	ld	c, -1 (ix)
-	ld	b, #0x00
-;main.c:141: if (camera.rowoffset == 0)
-	ld	de, (#(_camera + 8) + 0)
-;main.c:145: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);
-	ld	hl, #(_camera + 6)
-	ld	l, (hl)
-;	spillPairReg hl
-	ld	a, -3 (ix)
+00113$:
+;main.c:113: if (camera.scroll_x % 8 == 0 && camera.view_x > 0)
+	ld	hl, (#_camera + 0)
+;main.c:127: SMS_loadTileMap(camera.coloffset,rowoffset + (y - ydex),brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);            
+	ld	a, l
 	add	a, #0xfe
 	ld	-5 (ix), a
-	ld	a, -2 (ix)
+	ld	a, h
 	adc	a, #0xff
 	ld	-4 (ix), a
-;main.c:156: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);
-	ld	-3 (ix), l
-	ld	-2 (ix), #0x00
-;main.c:154: if (y < 28 - (camera.scroll_y / 8)) 
-	ld	a, c
-	sub	a, -7 (ix)
-	ld	a, b
-	sbc	a, -6 (ix)
-	jp	PO, 00218$
-	xor	a, #0x80
-00218$:
-	jp	P, 00107$
-;main.c:156: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);
-	ld	iy, #_brawl_street_tilemap_bin
-	push	bc
-	ld	c, -5 (ix)
-	ld	b, -4 (ix)
-	add	iy, bc
-	pop	bc
-	ld	hl, (#(_camera + 2) + 0)
-	add	hl, bc
-	push	de
-	ld	e, l
-	ld	d, h
-	add	hl, hl
-	add	hl, de
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	pop	de
-	push	bc
-	ld	c, l
-	ld	b, h
-	add	iy, bc
-	pop	bc
-	ex	de, hl
-	add	hl, bc
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ld	e, -3 (ix)
+;main.c:120: for (unsigned char y = 0; y < 28; y++)
+	ld	a, -1 (ix)
+	sub	a, #0x1c
+	jp	NC, 00108$
+;main.c:122: if (y >= 28 - rowoffset && rowoffset != 0)//When screen is offset, as the loop reaches the edge of the screen, we need to reset the loop so it begins at zero to finish off tiling.
+	ld	e, c
 	ld	d, #0x00
-	add	hl, de
-	add	hl, hl
-	ld	a, h
-	or	a, #0x78
-	ld	h, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	de, #0x0002
-	push	de
-	push	iy
-	pop	de
-	call	_SMS_VRAMmemcpy
-	jr	00123$
-00107$:
-;main.c:160: SMS_loadTileMap(camera.coloffset,camera.rowoffset - 28 + y,brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);
+	ld	hl, #0x001c
+	cp	a, a
+	sbc	hl, de
+	ld	a, -1 (ix)
+	ld	-3 (ix), a
+	ld	-2 (ix), #0x00
+	ld	a, -3 (ix)
+	sub	a, l
+	ld	a, -2 (ix)
+	sbc	a, h
+	jp	PO, 00184$
+	xor	a, #0x80
+00184$:
+	jp	M, 00106$
+	ld	a, c
+	or	a, a
+	jr	Z, 00106$
+;main.c:124: rowoffset = 0; //removes the offset from the equation. we need to start at zero.
+	ld	c, #0x00
+;main.c:125: ydex = y; //store the y loop current index, to subtract it.
+	ld	a, -1 (ix)
+	ld	-6 (ix), a
+00106$:
+;main.c:127: SMS_loadTileMap(camera.coloffset,rowoffset + (y - ydex),brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);            
 	ld	iy, #_brawl_street_tilemap_bin
-	push	bc
-	ld	c, -5 (ix)
-	ld	b, -4 (ix)
-	add	iy, bc
-	pop	bc
-	ld	hl, (#(_camera + 2) + 0)
-	add	hl, bc
-	push	de
+	ld	e, -5 (ix)
+	ld	d, -4 (ix)
+	add	iy, de
+	ld	hl, (#_camera + 2)
+	ld	e, -3 (ix)
+	ld	d, -2 (ix)
+	add	hl, de
 	ld	e, l
 	ld	d, h
 	add	hl, hl
@@ -819,30 +517,38 @@ _cam_pan_left::
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
-	pop	de
-	push	bc
-	ld	c, l
-	ld	b, h
-	add	iy, bc
-	pop	bc
-	ld	a, e
-	add	a, #0xe4
+	ex	de, hl
+	add	iy, de
+	ld	e, c
+	ld	d, #0x00
+	ld	l, -6 (ix)
+;	spillPairReg hl
+;	spillPairReg hl
+	ld	b, #0x00
+	ld	a, -3 (ix)
+	sub	a, l
 	ld	l, a
 ;	spillPairReg hl
 ;	spillPairReg hl
-	ld	a, d
-	adc	a, #0xff
+	ld	a, -2 (ix)
+	sbc	a, b
 	ld	h, a
 ;	spillPairReg hl
 ;	spillPairReg hl
-	add	hl, bc
+	add	hl, de
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
-	ld	e, -3 (ix)
-	ld	d, #0x00
+	ex	de,hl
+	ld	a, (#(_camera + 6) + 0)
+	ld	h, #0x00
+;	spillPairReg hl
+;	spillPairReg hl
+	ld	l, a
+;	spillPairReg hl
+;	spillPairReg hl
 	add	hl, de
 	add	hl, hl
 	ld	a, h
@@ -850,28 +556,30 @@ _cam_pan_left::
 	ld	h, a
 ;	spillPairReg hl
 ;	spillPairReg hl
+	push	bc
 	ld	de, #0x0002
 	push	de
 	push	iy
 	pop	de
 	call	_SMS_VRAMmemcpy
-00123$:
-;main.c:151: for (unsigned char y = 0; y < 28; y++)
+	pop	bc
+;main.c:120: for (unsigned char y = 0; y < 28; y++)
 	inc	-1 (ix)
-	jp	00122$
-00114$:
-;main.c:165: camera.view_x-= 2;
-	ld	c, -3 (ix)
-	ld	b, -2 (ix)
-	dec	bc
-	dec	bc
-	ld	(_camera), bc
-00124$:
-;main.c:168: }
+	jp	00113$
+00108$:
+;main.c:130: camera.view_x-= 2;
+	ld	hl, #_camera
+	ld	a, -5 (ix)
+	ld	(hl), a
+	inc	hl
+	ld	a, -4 (ix)
+	ld	(hl), a
+00115$:
+;main.c:133: }
 	ld	sp, ix
 	pop	ix
 	ret
-;main.c:170: void cam_pan_up(void)
+;main.c:135: void cam_pan_up(void)
 ;	---------------------------------
 ; Function cam_pan_up
 ; ---------------------------------
@@ -879,10 +587,9 @@ _cam_pan_up::
 	push	ix
 	ld	ix,#0
 	add	ix,sp
-	ld	hl, #-12
-	add	hl, sp
-	ld	sp, hl
-;main.c:172: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register.
+	push	af
+	push	af
+;main.c:137: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register.
 	ld	a, (#(_camera + 5) + 0)
 	ld	c, a
 	ld	b, #0x00
@@ -899,62 +606,100 @@ _cam_pan_up::
 	sub	a, b
 	ld	b, a
 	ld	((_camera + 8)), bc
-;main.c:174: if (camera.rowoffset == 28) //Tile placement is from 0-27. So when it hits 28 we need to reset the rowoffset.
+;main.c:139: if (camera.rowoffset == 28) //Tile placement is from 0-27. So when it hits 28 we need to reset the rowoffset.
 	ld	a, c
 	sub	a, #0x1c
 	or	a, b
 	jr	NZ, 00102$
-;main.c:176: camera.rowoffset = 0;
+;main.c:141: camera.rowoffset = 0;
 	ld	hl, #0x0000
 	ld	((_camera + 8)), hl
 00102$:
-;main.c:181: if (camera.scroll_y % 8 == 0 && camera.view_y > 0)
+;main.c:145: if (camera.scroll_y % 8 == 0 && camera.view_y > 0)
 	ld	a, (#(_camera + 5) + 0)
-	ld	-4 (ix), a
-	ld	-3 (ix), #0x00
-	ld	a, -4 (ix)
+	ld	c, a
+	ld	b, #0x00
+	ld	a, c
 	and	a, #0x07
-	or	a,#0x00
-	jp	NZ, 00116$
+	ld	e, a
+	ld	d, #0x00
+	ld	a, d
+	or	a, e
+	jp	NZ, 00108$
 	ld	hl, (#(_camera + 2) + 0)
 	xor	a, a
 	cp	a, l
 	sbc	a, h
-	jp	PO, 00232$
+	jp	PO, 00192$
 	xor	a, #0x80
-00232$:
-	jp	P, 00116$
-;main.c:186: if (camera.coloffset == 0)
-	ld	hl, #(_camera + 6)
-	ld	a, (hl)
+00192$:
+	jp	P, 00108$
+;main.c:147: camera.rowoffset = (camera.scroll_y / 8);
+	sra	b
+	rr	c
+	sra	b
+	rr	c
+	sra	b
+	rr	c
+	ld	((_camera + 8)), bc
+;main.c:149: unsigned char coloffset = camera.coloffset; //Save the last state of coloffset in a temp variable.
+	ld	hl, #_camera + 6
+	ld	c, (hl)
+;main.c:150: unsigned char xdex = 0; //We store the current x loop position, in order to subtract from the loop, to start at zero again when at last tile position.
+	ld	-4 (ix), #0x00
+;main.c:152: for (unsigned char x = 0; x < 32; x++)
+	ld	-1 (ix), #0x00
+00116$:
+;main.c:159: SMS_loadTileMap(coloffset + (x - xdex),camera.rowoffset - 1,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);         
+	ld	hl, (#(_camera + 2) + 0)
+	ld	a, l
+	add	a, #0xff
+	ld	-3 (ix), a
+	ld	a, h
+	adc	a, #0xff
 	ld	-2 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-1 (ix), a
-	or	a, -2 (ix)
-	jr	NZ, 00113$
-;main.c:188: for (unsigned char x = 0; x < 32; x++)
-	ld	c, #0x00
-00124$:
-	ld	a, c
+;main.c:152: for (unsigned char x = 0; x < 32; x++)
+	ld	a, -1 (ix)
 	sub	a, #0x20
-	jp	NC, 00114$
-;main.c:190: SMS_loadTileMap(camera.coloffset + x,-camera.rowoffset + 27,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);
-	ld	de, (#_camera + 0)
-	ld	l, c
-;	spillPairReg hl
-;	spillPairReg hl
-	xor	a, a
-	ld	h, a
+	jr	NC, 00106$
+;main.c:154: if (x >= 32 - coloffset && coloffset != 0)//When screen is offset, as the loop reaches the edge of the screen, we need to reset the loop so it begins at zero to finish off tiling.
+	ld	e, c
+	ld	d, #0x00
+	ld	hl, #0x0020
+	cp	a, a
+	sbc	hl, de
+	ld	e, -1 (ix)
+	ld	d, #0x00
+	ld	a, e
+	sub	a, l
+	ld	a, d
+	sbc	a, h
+	jp	PO, 00193$
+	xor	a, #0x80
+00193$:
+	jp	M, 00104$
+	ld	a, c
+	or	a, a
+	jr	Z, 00104$
+;main.c:156: coloffset = 0; //removes the offset from the equation. we need to start at zero.
+	ld	c, #0x00
+;main.c:157: xdex = x; //store the x loop current index, to subtract it.
+	ld	a, -1 (ix)
+	ld	-4 (ix), a
+00104$:
+;main.c:159: SMS_loadTileMap(coloffset + (x - xdex),camera.rowoffset - 1,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);         
+	ld	hl, (#_camera + 0)
+	ex	de, hl
 	add	hl, hl
+	ex	de, hl
 	add	hl, de
 	ex	de, hl
 	ld	iy, #_brawl_street_tilemap_bin
 	add	iy, de
-	ld	hl, (#(_camera + 2) + 0)
-	dec	hl
-	ld	e, l
-	ld	d, h
+	ld	e, -3 (ix)
+	ld	d, -2 (ix)
+	ld	l, e
+	ld	h, d
 	add	hl, hl
 	add	hl, de
 	add	hl, hl
@@ -966,29 +711,17 @@ _cam_pan_up::
 	ex	de, hl
 	add	iy, de
 	ld	hl, (#(_camera + 8) + 0)
-	xor	a, a
-	sub	a, l
+	dec	hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	ld	a, -1 (ix)
+	sub	a, -4 (ix)
+	add	a, c
+	ld	d, #0x00
 	ld	e, a
-	sbc	a, a
-	sub	a, h
-	ld	d, a
-	ld	hl, #0x001b
-	add	hl, de
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ex	de,hl
-	ld	a, (#(_camera + 6) + 0)
-	ld	b, c
-	add	a, b
-	ld	l, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	h, #0x00
-;	spillPairReg hl
-;	spillPairReg hl
 	add	hl, de
 	add	hl, hl
 	ld	a, h
@@ -1003,228 +736,51 @@ _cam_pan_up::
 	pop	de
 	call	_SMS_VRAMmemcpy
 	pop	bc
-;main.c:188: for (unsigned char x = 0; x < 32; x++)
-	inc	c
-	jr	00124$
-00113$:
-;main.c:193: else if (camera.coloffset != 0)
-	ld	a, -1 (ix)
-	or	a, -2 (ix)
-	jp	Z, 00114$
-;main.c:195: camera.rowoffset = (camera.scroll_y / 8); //(camera.scroll_y / 8) - 1
-	ld	c, -4 (ix)
-	ld	b, #0x00
-	sra	b
-	rr	c
-	sra	b
-	rr	c
-	sra	b
-	rr	c
-	ld	((_camera + 8)), bc
-;main.c:196: if (camera.rowoffset == 0)
-	ld	hl, (#(_camera + 8) + 0)
-	ld	a, h
-	or	a, l
-	jr	NZ, 00145$
-;main.c:198: camera.rowoffset = 28;
-	ld	hl, #0x001c
-	ld	((_camera + 8)), hl
-;main.c:200: for (unsigned char x = 0; x < 32; x++)
-00145$:
-	ld	-1 (ix), #0x00
-00127$:
-	ld	a, -1 (ix)
-	sub	a, #0x20
-	jp	NC, 00114$
-;main.c:202: if (x < 32 - camera.coloffset)
-	ld	bc, (#(_camera + 6) + 0)
-	ld	a, #0x20
-	sub	a, c
-	ld	-12 (ix), a
-	sbc	a, a
-	sub	a, b
-	ld	-11 (ix), a
-	ld	a, -1 (ix)
-	ld	-10 (ix), a
-	ld	-9 (ix), #0x00
-;main.c:190: SMS_loadTileMap(camera.coloffset + x,-camera.rowoffset + 27,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);
-	ld	hl, #_camera
-	ld	a, (hl)
-	ld	-8 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-7 (ix), a
-	ld	de, (#(_camera + 2) + 0)
-	ld	hl, #(_camera + 8)
-	ld	a, (hl)
-	ld	-3 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-2 (ix), a
-;main.c:204: SMS_loadTileMap(camera.coloffset + x,camera.rowoffset - 1,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);
-	ld	l, -10 (ix)
-	ld	h, -9 (ix)
-	add	hl, hl
-	ld	a, -1 (ix)
-	ld	-6 (ix), a
-	dec	de
-	ld	a, -3 (ix)
-	add	a, #0xff
-	ld	-5 (ix), a
-	ld	a, -2 (ix)
-	adc	a, #0xff
-	ld	-4 (ix), a
-	ld	a, -8 (ix)
-	add	a, l
-	ld	-3 (ix), a
-	ld	a, -7 (ix)
-	adc	a, h
-	ld	-2 (ix), a
-	ld	l, e
-	ld	h, d
-	add	hl, hl
-	add	hl, de
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ex	de, hl
-	ld	l, -5 (ix)
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	h, -4 (ix)
-;	spillPairReg hl
-;	spillPairReg hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ld	-5 (ix), l
-	ld	-4 (ix), h
-;main.c:202: if (x < 32 - camera.coloffset)
-	ld	a, -10 (ix)
-	sub	a, -12 (ix)
-	ld	a, -9 (ix)
-	sbc	a, -11 (ix)
-	jp	PO, 00233$
-	xor	a, #0x80
-00233$:
-	jp	P, 00107$
-;main.c:204: SMS_loadTileMap(camera.coloffset + x,camera.rowoffset - 1,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);
-	ld	a, #<(_brawl_street_tilemap_bin)
-	add	a, -3 (ix)
-	ld	l, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	a, #>(_brawl_street_tilemap_bin)
-	adc	a, -2 (ix)
-	ld	h, a
-;	spillPairReg hl
-;	spillPairReg hl
-	add	hl, de
-	ex	de, hl
-	ld	a, c
-	add	a, -6 (ix)
-	ld	c, a
-	ld	b, #0x00
-	ld	l, -5 (ix)
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	h, -4 (ix)
-;	spillPairReg hl
-;	spillPairReg hl
-	add	hl, bc
-	add	hl, hl
-	ld	a, h
-	or	a, #0x78
-	ld	h, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	bc, #0x0002
-	push	bc
-	call	_SMS_VRAMmemcpy
-	jr	00128$
-00107$:
-;main.c:208: SMS_loadTileMap(camera.coloffset - 32 + x,camera.rowoffset - 1,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);
-	ld	a, #<(_brawl_street_tilemap_bin)
-	add	a, -3 (ix)
-	ld	l, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	a, #>(_brawl_street_tilemap_bin)
-	adc	a, -2 (ix)
-	ld	h, a
-;	spillPairReg hl
-;	spillPairReg hl
-	add	hl, de
-	ex	de, hl
-	ld	a, c
-	add	a, #0xe0
-	add	a, -6 (ix)
-	ld	c, a
-	ld	b, #0x00
-	ld	l, -5 (ix)
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	h, -4 (ix)
-;	spillPairReg hl
-;	spillPairReg hl
-	add	hl, bc
-	add	hl, hl
-	ld	a, h
-	or	a, #0x78
-	ld	h, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	bc, #0x0002
-	push	bc
-	call	_SMS_VRAMmemcpy
-00128$:
-;main.c:200: for (unsigned char x = 0; x < 32; x++)
+;main.c:152: for (unsigned char x = 0; x < 32; x++)
 	inc	-1 (ix)
-	jp	00127$
-00114$:
-;main.c:214: camera.view_y--;
+	jp	00116$
+00106$:
+;main.c:162: camera.view_y--;
+	ld	hl, #(_camera + 2)
+	ld	a, -3 (ix)
+	ld	(hl), a
+	inc	hl
+	ld	a, -2 (ix)
+	ld	(hl), a
+00108$:
+;main.c:165: if (camera.view_y > 0 || camera.scroll_y % 32 != 0)
 	ld	bc, (#(_camera + 2) + 0)
-	dec	bc
-	ld	((_camera + 2)), bc
-00116$:
-;main.c:217: if (camera.view_y > 0 || camera.scroll_y % 32 != 0)
-	ld	bc, (#(_camera + 2) + 0)
-;main.c:172: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register.
+;main.c:137: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register.
 	ld	hl, #(_camera + 5)
 	ld	e, (hl)
-;main.c:217: if (camera.view_y > 0 || camera.scroll_y % 32 != 0)
+;main.c:165: if (camera.view_y > 0 || camera.scroll_y % 32 != 0)
 	xor	a, a
 	cp	a, c
 	sbc	a, b
-	jp	PO, 00234$
+	jp	PO, 00194$
 	xor	a, #0x80
-00234$:
-	jp	M, 00120$
+00194$:
+	jp	M, 00112$
 	ld	a, e
 	and	a, #0x1f
-	jr	Z, 00129$
-00120$:
-;main.c:220: camera.scroll_y--;
+	jr	Z, 00118$
+00112$:
+;main.c:168: camera.scroll_y--;
 	dec	e
 	ld	hl, #(_camera + 5)
 	ld	(hl), e
-;main.c:221: if (camera.scroll_y > 223)
+;main.c:169: if (camera.scroll_y > 223)
 	ld	a, #0xdf
 	sub	a, e
-	jr	NC, 00129$
-;main.c:223: camera.scroll_y = 223;
+	jr	NC, 00118$
+;main.c:171: camera.scroll_y = 223;
 	ld	(hl), #0xdf
-00129$:
-;main.c:228: }
+00118$:
+;main.c:175: }
 	ld	sp, ix
 	pop	ix
 	ret
-;main.c:230: void cam_pan_down(void)
+;main.c:177: void cam_pan_down(void)
 ;	---------------------------------
 ; Function cam_pan_down
 ; ---------------------------------
@@ -1232,10 +788,9 @@ _cam_pan_down::
 	push	ix
 	ld	ix,#0
 	add	ix,sp
-	ld	hl, #-11
-	add	hl, sp
-	ld	sp, hl
-;main.c:233: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register in tiles.
+	push	af
+	push	af
+;main.c:180: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register in tiles.
 	ld	bc, #_camera + 5
 	ld	a, (bc)
 	ld	e, a
@@ -1251,7 +806,7 @@ _cam_pan_down::
 	sbc	hl, de
 	ex	de, hl
 	ld	((_camera + 8)), de
-;main.c:236: if (camera.view_y < 24)
+;main.c:182: if (camera.view_y < 24) //Prvent the scrolling from going past the height of the map. 24 tiles = 192 pixels
 	ld	hl, (#(_camera + 2) + 0)
 	ld	de, #0x8018
 	add	hl, hl
@@ -1260,88 +815,111 @@ _cam_pan_down::
 	rr	l
 	sbc	hl, de
 	jr	NC, 00102$
-;main.c:238: camera.scroll_y++;
+;main.c:184: camera.scroll_y++;
 	ld	a, (bc)
 	inc	a
 	ld	(bc), a
 00102$:
-;main.c:241: if (camera.scroll_y > 223)
+;main.c:187: if (camera.scroll_y > 223) //We need to reset the scroll_y to prevent it from hitching the screen, from overflow.
 	ld	a, (bc)
 	ld	e, a
 	ld	a, #0xdf
 	sub	a, e
 	jr	NC, 00104$
-;main.c:243: camera.scroll_y = 0;
+;main.c:189: camera.scroll_y = 0;
 	xor	a, a
 	ld	(bc), a
 00104$:
-;main.c:233: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register in tiles.
+;main.c:180: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register in tiles.
 	ld	a, (bc)
-;main.c:245: if (camera.scroll_y % 8 == 0 && camera.view_y < 24)
-	ld	-7 (ix), a
-	ld	-6 (ix), #0x00
-	ld	a, -7 (ix)
-	and	a, #0x07
-	jp	NZ,00117$
-;main.c:236: if (camera.view_y < 24)
-	ld	hl, #(_camera + 2)
-	ld	a, (hl)
-	ld	-3 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-2 (ix), a
-;main.c:245: if (camera.scroll_y % 8 == 0 && camera.view_y < 24)
-	ld	a, -3 (ix)
-	sub	a, #0x18
-	ld	a, -2 (ix)
-	rla
-	ccf
-	rra
-	sbc	a, #0x80
-	jp	NC, 00117$
-;main.c:248: if (camera.coloffset == 0)
-	ld	hl, #(_camera + 6)
-	ld	a, (hl)
-	ld	-5 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-4 (ix), a
-	or	a, -5 (ix)
-	jr	NZ, 00114$
-;main.c:250: for (unsigned char x = 0; x < 32; x ++)
-	ld	c, #0x00
-00122$:
-;main.c:236: if (camera.view_y < 24)
-	ld	hl, #(_camera + 2)
-	ld	a, (hl)
-	ld	-3 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-2 (ix), a
-;main.c:250: for (unsigned char x = 0; x < 32; x ++)
+;main.c:192: if (camera.scroll_y % 8 == 0 && camera.view_y < 24) //Time to update the row with tiles. Happens every 1 tile of scrolling. 8 x 8 pixels = 1 tile.
+	ld	c, a
+	ld	b, #0x00
 	ld	a, c
-	sub	a, #0x20
-	jp	NC, 00115$
-;main.c:252: SMS_loadTileMap(camera.coloffset + x,-camera.rowoffset + 28,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-	ld	de, (#_camera + 0)
-	ld	l, c
-;	spillPairReg hl
-;	spillPairReg hl
-	xor	a, a
-	ld	h, a
+	and	a, #0x07
+	jp	NZ,00110$
+	ld	hl, (#(_camera + 2) + 0)
+	ld	de, #0x8018
 	add	hl, hl
+	ccf
+	rr	h
+	rr	l
+	sbc	hl, de
+	jp	NC, 00110$
+;main.c:195: camera.rowoffset = (camera.scroll_y / 8) - 1;
+	sra	b
+	rr	c
+	sra	b
+	rr	c
+	sra	b
+	rr	c
+	dec	bc
+	ld	((_camera + 8)), bc
+;main.c:197: unsigned char coloffset = camera.coloffset; //Save the last state of coloffset in a temp variable.
+	ld	hl, #_camera + 6
+	ld	c, (hl)
+;main.c:198: unsigned char xdex = 0; //We store the current x loop position, in order to subtract from the loop, to start at zero again when at last tile position.
+	ld	-4 (ix), #0x00
+;main.c:200: for (unsigned char x = 0; x < 32; x ++)
+	ld	-1 (ix), #0x00
+00115$:
+;main.c:182: if (camera.view_y < 24) //Prvent the scrolling from going past the height of the map. 24 tiles = 192 pixels
+	ld	hl, #(_camera + 2)
+	ld	a, (hl)
+	ld	-3 (ix), a
+	inc	hl
+	ld	a, (hl)
+	ld	-2 (ix), a
+;main.c:200: for (unsigned char x = 0; x < 32; x ++)
+	ld	a, -1 (ix)
+	sub	a, #0x20
+	jr	NC, 00108$
+;main.c:202: if (x >= 32 - coloffset && coloffset != 0)//When screen is offset, as the loop reaches the edge of the screen, we need to reset the loop so it begins at zero to finish off tiling.
+	ld	e, c
+	ld	d, #0x00
+	ld	hl, #0x0020
+	cp	a, a
+	sbc	hl, de
+	ld	e, -1 (ix)
+	ld	d, #0x00
+	ld	a, e
+	sub	a, l
+	ld	a, d
+	sbc	a, h
+	jp	PO, 00191$
+	xor	a, #0x80
+00191$:
+	jp	M, 00106$
+	ld	a, c
+	or	a, a
+	jr	Z, 00106$
+;main.c:204: coloffset = 0; //removes the offset from the equation. we need to start at zero.
+	ld	c, #0x00
+;main.c:205: xdex = x; //store the x loop current index, to subtract it.
+	ld	a, -1 (ix)
+	ld	-4 (ix), a
+00106$:
+;main.c:207: SMS_loadTileMap(coloffset + (x - xdex),camera.rowoffset,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
+	ld	hl, (#_camera + 0)
+	ex	de, hl
+	add	hl, hl
+	ex	de, hl
 	add	hl, de
 	ex	de, hl
-	ld	iy, #_brawl_street_tilemap_bin
-	add	iy, de
-	ld	l, -3 (ix)
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	h, -2 (ix)
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	de, #0x001c
+	ld	hl, #_brawl_street_tilemap_bin
 	add	hl, de
+	ex	de, hl
+	ld	a, -3 (ix)
+	add	a, #0x1c
+	ld	l, a
+;	spillPairReg hl
+;	spillPairReg hl
+	ld	a, -2 (ix)
+	adc	a, #0x00
+	ld	h, a
+;	spillPairReg hl
+;	spillPairReg hl
+	push	de
 	ld	e, l
 	ld	d, h
 	add	hl, hl
@@ -1352,33 +930,28 @@ _cam_pan_down::
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
-	ex	de, hl
-	add	iy, de
-	ld	hl, (#(_camera + 8) + 0)
-	xor	a, a
-	sub	a, l
-	ld	e, a
-	sbc	a, a
-	sub	a, h
-	ld	d, a
-	ld	hl, #0x001c
+	pop	de
 	add	hl, de
+	ex	de, hl
+	ld	hl, (#(_camera + 8) + 0)
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
-	ex	de,hl
-	ld	a, (#(_camera + 6) + 0)
-	ld	b, c
-	add	a, b
+	ld	a, -1 (ix)
+	sub	a, -4 (ix)
+	add	a, c
+	ld	b, #0x00
+	add	a, l
 	ld	l, a
 ;	spillPairReg hl
 ;	spillPairReg hl
-	ld	h, #0x00
+	ld	a, b
+	adc	a, h
+	ld	h, a
 ;	spillPairReg hl
 ;	spillPairReg hl
-	add	hl, de
 	add	hl, hl
 	ld	a, h
 	or	a, #0x78
@@ -1386,581 +959,140 @@ _cam_pan_down::
 ;	spillPairReg hl
 ;	spillPairReg hl
 	push	bc
-	ld	de, #0x0002
-	push	de
-	push	iy
-	pop	de
+	ld	bc, #0x0002
+	push	bc
 	call	_SMS_VRAMmemcpy
 	pop	bc
-;main.c:250: for (unsigned char x = 0; x < 32; x ++)
-	inc	c
-	jr	00122$
-00114$:
-;main.c:255: else if (camera.coloffset != 0 && camera.view_y < 23)
-	ld	a, -4 (ix)
-	or	a, -5 (ix)
-	jp	Z, 00115$
-	ld	a, -3 (ix)
-	sub	a, #0x17
-	ld	a, -2 (ix)
-	rla
-	ccf
-	rra
-	sbc	a, #0x80
-	jp	NC, 00115$
-;main.c:257: camera.rowoffset = (camera.scroll_y / 8) - 1;
-	ld	c, -7 (ix)
-	ld	b, #0x00
-	sra	b
-	rr	c
-	sra	b
-	rr	c
-	sra	b
-	rr	c
-	dec	bc
-	ld	((_camera + 8)), bc
-;main.c:258: for (unsigned char x = 0; x < 32; x++)
-	ld	-1 (ix), #0x00
-00125$:
-;main.c:236: if (camera.view_y < 24)
-	ld	hl, #(_camera + 2)
-	ld	a, (hl)
-	ld	-3 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-2 (ix), a
-;main.c:258: for (unsigned char x = 0; x < 32; x++)
-	ld	a, -1 (ix)
-	sub	a, #0x20
-	jp	NC, 00115$
-;main.c:260: if (x < 32 - camera.coloffset)
-	ld	bc, (#(_camera + 6) + 0)
-	ld	a, #0x20
-	sub	a, c
-	ld	-11 (ix), a
-	sbc	a, a
-	sub	a, b
-	ld	-10 (ix), a
-	ld	a, -1 (ix)
-	ld	-9 (ix), a
-	ld	-8 (ix), #0x00
-;main.c:252: SMS_loadTileMap(camera.coloffset + x,-camera.rowoffset + 28,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-	ld	hl, #_camera
-	ld	a, (hl)
-	ld	-7 (ix), a
-	inc	hl
-	ld	a, (hl)
-	ld	-6 (ix), a
-	ld	de, (#(_camera + 8) + 0)
-;main.c:262: SMS_loadTileMap(camera.coloffset + x,camera.rowoffset,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-	ld	l, -9 (ix)
-	ld	h, -8 (ix)
-	add	hl, hl
-	ld	-5 (ix), c
-	ld	a, -1 (ix)
-	ld	-4 (ix), a
-;main.c:252: SMS_loadTileMap(camera.coloffset + x,-camera.rowoffset + 28,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-	ld	a, -3 (ix)
-	add	a, #0x1c
-	ld	c, a
-	ld	a, -2 (ix)
-	adc	a, #0x00
-	ld	b, a
-;main.c:262: SMS_loadTileMap(camera.coloffset + x,camera.rowoffset,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-	ld	a, -7 (ix)
-	add	a, l
-	ld	-3 (ix), a
-	ld	a, -6 (ix)
-	adc	a, h
-	ld	-2 (ix), a
-	ld	l, c
-	ld	h, b
-	add	hl, hl
-	add	hl, bc
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ld	c, l
-	ld	b, h
-	ex	de, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ex	de, hl
-;main.c:260: if (x < 32 - camera.coloffset)
-	ld	a, -9 (ix)
-	sub	a, -11 (ix)
-	ld	a, -8 (ix)
-	sbc	a, -10 (ix)
-	jp	PO, 00230$
-	xor	a, #0x80
-00230$:
-	jp	P, 00107$
-;main.c:262: SMS_loadTileMap(camera.coloffset + x,camera.rowoffset,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-	ld	a, #<(_brawl_street_tilemap_bin)
-	add	a, -3 (ix)
-	ld	l, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	a, #>(_brawl_street_tilemap_bin)
-	adc	a, -2 (ix)
-	ld	h, a
-;	spillPairReg hl
-;	spillPairReg hl
-	add	hl, bc
-	ld	c, l
-	ld	b, h
-	ld	a, -5 (ix)
-	add	a, -4 (ix)
-	ld	l, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	h, #0x00
-;	spillPairReg hl
-;	spillPairReg hl
-	add	hl, de
-	add	hl, hl
-	ld	a, h
-	or	a, #0x78
-	ld	h, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	de, #0x0002
-	push	de
-	ld	e, c
-	ld	d, b
-	call	_SMS_VRAMmemcpy
-	jr	00126$
-00107$:
-;main.c:266: SMS_loadTileMap(camera.coloffset - 32 + x,camera.rowoffset,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-	ld	a, #<(_brawl_street_tilemap_bin)
-	add	a, -3 (ix)
-	ld	l, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	a, #>(_brawl_street_tilemap_bin)
-	adc	a, -2 (ix)
-	ld	h, a
-;	spillPairReg hl
-;	spillPairReg hl
-	add	hl, bc
-	ld	c, l
-	ld	b, h
-	ld	a, -5 (ix)
-	add	a, #0xe0
-	add	a, -4 (ix)
-	ld	h, #0x00
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	l, a
-;	spillPairReg hl
-;	spillPairReg hl
-	add	hl, de
-	add	hl, hl
-	ld	a, h
-	or	a, #0x78
-	ld	h, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	de, #0x0002
-	push	de
-	ld	e, c
-	ld	d, b
-	call	_SMS_VRAMmemcpy
-00126$:
-;main.c:258: for (unsigned char x = 0; x < 32; x++)
+;main.c:200: for (unsigned char x = 0; x < 32; x ++)
 	inc	-1 (ix)
-	jp	00125$
-00115$:
-;main.c:271: camera.view_y++;
+	jp	00115$
+00108$:
+;main.c:211: camera.view_y++; //Increase the view_y by 1.
 	ld	c, -3 (ix)
 	ld	b, -2 (ix)
 	inc	bc
 	ld	((_camera + 2)), bc
-00117$:
-;main.c:273: if (camera.rowoffset == 28)
+00110$:
+;main.c:213: if (camera.rowoffset == 28) //Reset rowoffset because the nametable(the tilemap table in VRAM) only has 28 tiles in height (256 x 224. the 32 extra pixels in height is cropped in NTSC resolution..)
 	ld	hl, (#(_camera + 8) + 0)
 	ld	a, l
 	sub	a, #0x1c
 	or	a, h
-	jr	NZ, 00127$
-;main.c:275: camera.rowoffset = 0;
+	jr	NZ, 00117$
+;main.c:215: camera.rowoffset = 0;
 	ld	hl, #0x0000
 	ld	((_camera + 8)), hl
-00127$:
-;main.c:278: }
+00117$:
+;main.c:218: }
 	ld	sp, ix
 	pop	ix
 	ret
-;main.c:282: void main(void)
+;main.c:222: void main(void)
 ;	---------------------------------
 ; Function main
 ; ---------------------------------
 _main::
-;main.c:285: SMS_displayOff();
+;main.c:225: SMS_displayOff();
 	ld	hl, #0x0140
 	call	_SMS_VDPturnOffFeature
-;main.c:287: SMS_VRAMmemsetW(0, 0x0000, 16384);
+;main.c:228: SMS_VRAMmemsetW(0, 0x0000, 16384);
 	ld	hl, #0x4000
 	push	hl
 	ld	de, #0x0000
 	ld	h, l
 	call	_SMS_VRAMmemsetW
-;main.c:288: SMS_zeroBGPalette();
+;main.c:229: SMS_zeroBGPalette();
 	call	_SMS_zeroBGPalette
-;main.c:289: SMS_zeroSpritePalette();
+;main.c:230: SMS_zeroSpritePalette();
 	call	_SMS_zeroSpritePalette
-;main.c:292: SMS_VDPturnOnFeature(VDPFEATURE_LEFTCOLBLANK);
+;main.c:233: SMS_VDPturnOnFeature(VDPFEATURE_LEFTCOLBLANK);
 	ld	hl, #0x0020
 	call	_SMS_VDPturnOnFeature
-;main.c:293: SMS_VDPturnOnFeature(VDPFEATURE_HIDEFIRSTCOL);
+;main.c:234: SMS_VDPturnOnFeature(VDPFEATURE_HIDEFIRSTCOL);
 	ld	hl, #0x0020
 	call	_SMS_VDPturnOnFeature
-;main.c:295: SMS_mapROMBank(bg_pal_bin_bank);
+;main.c:237: SMS_mapROMBank(bg_pal_bin_bank);
 	ld	hl, #_ROM_bank_to_be_mapped_on_slot2
 	ld	(hl), #0x03
-;main.c:296: SMS_loadBGPalette(bg_pal_bin);
+;main.c:238: SMS_loadBGPalette(bg_pal_bin);
 	ld	hl, #_bg_pal_bin
 	call	_SMS_loadBGPalette
-;main.c:297: SMS_loadSpritePalette(spr_pal_bin);
+;main.c:239: SMS_loadSpritePalette(spr_pal_bin);
 	ld	hl, #_spr_pal_bin
 	call	_SMS_loadSpritePalette
-;main.c:299: SMS_setBackdropColor(15);
+;main.c:242: SMS_setBackdropColor(15);
 	ld	l, #0x0f
 ;	spillPairReg hl
 ;	spillPairReg hl
 	call	_SMS_setBackdropColor
-;main.c:302: SMS_loadPSGaidencompressedTiles(font_8x8_psgcompr,192);
+;main.c:245: SMS_loadPSGaidencompressedTiles(font_8x8_psgcompr,192);
 	ld	de, #0x5800
 	ld	hl, #_font_8x8_psgcompr
 	call	_SMS_loadPSGaidencompressedTilesatAddr
-;main.c:303: SMS_configureTextRenderer(160);
+;main.c:246: SMS_configureTextRenderer(160);
 	ld	hl, #0x00a0
 	call	_SMS_configureTextRenderer
-;main.c:307: SMS_mapROMBank(brawl_street_tiles_psgcompr_bank);
+;main.c:250: SMS_mapROMBank(brawl_street_tiles_psgcompr_bank);
 	ld	hl, #_ROM_bank_to_be_mapped_on_slot2
 	ld	(hl), #0x03
-;main.c:308: SMS_loadPSGaidencompressedTiles(brawl_street_tiles_psgcompr,0);
+;main.c:251: SMS_loadPSGaidencompressedTiles(brawl_street_tiles_psgcompr,0);
 	ld	de, #0x4000
 	ld	hl, #_brawl_street_tiles_psgcompr
 	call	_SMS_loadPSGaidencompressedTilesatAddr
-;main.c:309: redraw_stage(); //Draw map at current view position.
-	call	_redraw_stage
-;main.c:312: init_camera();
+;main.c:255: init_camera();
 	call	_init_camera
-;main.c:315: SMS_displayOn();
+;main.c:256: redraw_stage(); //Draw map at current view position.
+	call	_redraw_stage
+;main.c:259: SMS_displayOn();
 	ld	hl, #0x0140
 	call	_SMS_VDPturnOnFeature
-00174$:
-;main.c:321: if ((SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && (SMS_getKeysHeld() & PORT_A_KEY_DOWN) && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && camera.view_x < 130 && camera.view_y < 24)
+00110$:
+;main.c:266: if (SMS_getKeysHeld() & PORT_A_KEY_RIGHT)
 	call	_SMS_getKeysHeld
 	bit	3, e
-	jr	Z, 00131$
-	call	_SMS_getKeysHeld
-	bit	1, e
-	jr	Z, 00131$
-	call	_SMS_getKeysHeld
-	bit	2, e
-	jr	NZ, 00131$
-	call	_SMS_getKeysHeld
-	bit	0, e
-	jr	NZ, 00131$
-	ld	hl, (#_camera + 0)
-	ld	de, #0x0082
-	cp	a, a
-	sbc	hl, de
-	jr	NC, 00131$
-	ld	hl, (#_camera + 2)
-	ld	de, #0x8018
-	add	hl, hl
-	ccf
-	rr	h
-	rr	l
-	sbc	hl, de
-	jr	NC, 00131$
-;main.c:323: camera.pan_dir = DOWN_RIGHT;
-	ld	hl, #0x0004
-	ld	((_camera + 10)), hl
-;main.c:324: cam_pan_down();
-	call	_cam_pan_down
-;main.c:325: cam_pan_right();            
+	jr	Z, 00102$
+;main.c:269: cam_pan_right();
 	call	_cam_pan_right
-	jp	00132$
-00131$:
-;main.c:327: else if ((SMS_getKeysHeld() & PORT_A_KEY_LEFT) && (SMS_getKeysHeld() & PORT_A_KEY_DOWN) && !(SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && camera.view_x > 0 && camera.view_y < 24)
+00102$:
+;main.c:271: if (SMS_getKeysHeld() & PORT_A_KEY_LEFT)
 	call	_SMS_getKeysHeld
 	bit	2, e
-	jr	Z, 00123$
-	call	_SMS_getKeysHeld
-	bit	1, e
-	jr	Z, 00123$
-	call	_SMS_getKeysHeld
-	bit	3, e
-	jr	NZ, 00123$
+	jr	Z, 00104$
+;main.c:274: cam_pan_left();
+	call	_cam_pan_left
+00104$:
+;main.c:276: if (SMS_getKeysHeld() & PORT_A_KEY_UP)
 	call	_SMS_getKeysHeld
 	bit	0, e
-	jr	NZ, 00123$
-	ld	hl, (#_camera + 0)
-	ld	a, h
-	or	a, l
-	jr	Z, 00123$
-	ld	hl, (#_camera + 2)
-	ld	de, #0x8018
-	add	hl, hl
-	ccf
-	rr	h
-	rr	l
-	sbc	hl, de
-	jr	NC, 00123$
-;main.c:329: camera.pan_dir = DOWN_LEFT;
-	ld	hl, #0x0005
-	ld	((_camera + 10)), hl
-;main.c:330: cam_pan_down();
+	jr	Z, 00106$
+;main.c:278: cam_pan_up();
+	call	_cam_pan_up
+00106$:
+;main.c:280: if (SMS_getKeysHeld() & PORT_A_KEY_DOWN)
+	call	_SMS_getKeysHeld
+	bit	1, e
+	jr	Z, 00108$
+;main.c:282: cam_pan_down();
 	call	_cam_pan_down
-;main.c:331: cam_pan_left();       
-	call	_cam_pan_left
-	jp	00132$
-00123$:
-;main.c:333: else if ((SMS_getKeysHeld() & PORT_A_KEY_UP) && (SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && !(SMS_getKeysHeld() & PORT_A_KEY_DOWN) && camera.view_x > 0 && camera.scroll_y > 0)
-	call	_SMS_getKeysHeld
-	bit	0, e
-	jr	Z, 00115$
-	call	_SMS_getKeysHeld
-	bit	2, e
-	jr	Z, 00115$
-	call	_SMS_getKeysHeld
-	bit	3, e
-	jr	NZ, 00115$
-	call	_SMS_getKeysHeld
-	bit	1, e
-	jr	NZ, 00115$
-	ld	hl, (#_camera + 0)
-	ld	a, h
-	or	a, l
-	jr	Z, 00115$
-	ld	a, (#_camera + 5)
-	or	a, a
-	jr	Z, 00115$
-;main.c:335: camera.pan_dir = UP_LEFT;
-	ld	hl, #0x0006
-	ld	((_camera + 10)), hl
-;main.c:336: cam_pan_up();
-	call	_cam_pan_up
-;main.c:337: cam_pan_left();
-	call	_cam_pan_left
-	jr	00132$
-00115$:
-;main.c:339: else if ((SMS_getKeysHeld() & PORT_A_KEY_UP) && (SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_DOWN) && camera.view_x < 130 && camera.scroll_y > 0)
-	call	_SMS_getKeysHeld
-	bit	0, e
-	jr	Z, 00107$
-	call	_SMS_getKeysHeld
-	bit	3, e
-	jr	Z, 00107$
-	call	_SMS_getKeysHeld
-	bit	2, e
-	jr	NZ, 00107$
-	call	_SMS_getKeysHeld
-	bit	1, e
-	jr	NZ, 00107$
-	ld	hl, (#_camera + 0)
-	ld	de, #0x0082
-	cp	a, a
-	sbc	hl, de
-	jr	NC, 00107$
-	ld	a, (#_camera + 5)
-	or	a, a
-	jr	Z, 00107$
-;main.c:341: camera.pan_dir = UP_RIGHT;
-	ld	hl, #0x0007
-	ld	((_camera + 10)), hl
-;main.c:342: cam_pan_up();
-	call	_cam_pan_up
-;main.c:343: cam_pan_right();            
-	call	_cam_pan_right
-	jr	00132$
-00107$:
-;main.c:347: if (camera.pan_dir == DOWN_LEFT || camera.pan_dir == DOWN_RIGHT || camera.pan_dir == UP_LEFT || camera.pan_dir == UP_RIGHT)
-	ld	hl, (#(_camera + 10) + 0)
-	ld	a, l
-	sub	a, #0x05
-	or	a, h
-	jr	Z, 00101$
-	ld	a, l
-	sub	a, #0x04
-	or	a, h
-	jr	Z, 00101$
-	ld	a, l
-	sub	a, #0x06
-	or	a, h
-	jr	Z, 00101$
-	ld	a, l
-	sub	a, #0x07
-	or	a, h
-	jr	NZ, 00132$
-00101$:
-;main.c:349: camera.pan_dir = -1;
-	ld	hl, #0xffff
-	ld	((_camera + 10)), hl
-00132$:
-;main.c:353: if (SMS_getKeysHeld() & PORT_A_KEY_RIGHT && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && !(SMS_getKeysHeld() & PORT_A_KEY_DOWN) && camera.pan_dir != DOWN_RIGHT && camera.pan_dir != DOWN_LEFT && camera.pan_dir != UP_RIGHT && camera.pan_dir != UP_LEFT)
-	call	_SMS_getKeysHeld
-	bit	3, e
-	jr	Z, 00165$
-	call	_SMS_getKeysHeld
-	bit	0, e
-	jr	NZ, 00165$
-	call	_SMS_getKeysHeld
-	bit	1, e
-	jr	NZ, 00165$
-	ld	hl, (#(_camera + 10) + 0)
-	ld	a, l
-	sub	a, #0x04
-	or	a, h
-	jr	Z, 00165$
-	ld	a, l
-	sub	a, #0x05
-	or	a, h
-	jr	Z, 00165$
-	ld	a, l
-	sub	a, #0x07
-	or	a, h
-	jr	Z, 00165$
-	ld	a, l
-	sub	a, #0x06
-	or	a, h
-	jr	Z, 00165$
-;main.c:355: camera.pan_dir = RIGHT;
-	ld	hl, #0x0000
-	ld	((_camera + 10)), hl
-;main.c:356: cam_pan_right();
-	call	_cam_pan_right
-	jp	00166$
-00165$:
-;main.c:358: else if (SMS_getKeysHeld() & PORT_A_KEY_LEFT && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && !(SMS_getKeysHeld() & PORT_A_KEY_DOWN) && camera.pan_dir != DOWN_RIGHT && camera.pan_dir != DOWN_LEFT && camera.pan_dir != UP_RIGHT && camera.pan_dir != UP_LEFT )
-	call	_SMS_getKeysHeld
-	bit	2, e
-	jr	Z, 00156$
-	call	_SMS_getKeysHeld
-	bit	0, e
-	jr	NZ, 00156$
-	call	_SMS_getKeysHeld
-	bit	1, e
-	jr	NZ, 00156$
-	ld	hl, (#(_camera + 10) + 0)
-	ld	a, l
-	sub	a, #0x04
-	or	a, h
-	jr	Z, 00156$
-	ld	a, l
-	sub	a, #0x05
-	or	a, h
-	jr	Z, 00156$
-	ld	a, l
-	sub	a, #0x07
-	or	a, h
-	jr	Z, 00156$
-	ld	a, l
-	sub	a, #0x06
-	or	a, h
-	jr	Z, 00156$
-;main.c:360: camera.pan_dir = LEFT;
-	ld	hl, #0x0001
-	ld	((_camera + 10)), hl
-;main.c:361: cam_pan_left();
-	call	_cam_pan_left
-	jr	00166$
-00156$:
-;main.c:363: else if (SMS_getKeysHeld() & PORT_A_KEY_UP && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && camera.pan_dir != DOWN_RIGHT && camera.pan_dir != DOWN_LEFT && camera.pan_dir != UP_RIGHT && camera.pan_dir != UP_LEFT)
-	call	_SMS_getKeysHeld
-	bit	0, e
-	jr	Z, 00147$
-	call	_SMS_getKeysHeld
-	bit	2, e
-	jr	NZ, 00147$
-	call	_SMS_getKeysHeld
-	bit	3, e
-	jr	NZ, 00147$
-	ld	hl, (#(_camera + 10) + 0)
-	ld	a, l
-	sub	a, #0x04
-	or	a, h
-	jr	Z, 00147$
-	ld	a, l
-	sub	a, #0x05
-	or	a, h
-	jr	Z, 00147$
-	ld	a, l
-	sub	a, #0x07
-	or	a, h
-	jr	Z, 00147$
-	ld	a, l
-	sub	a, #0x06
-	or	a, h
-	jr	Z, 00147$
-;main.c:365: camera.pan_dir = UP;
-	ld	hl, #0x0002
-	ld	((_camera + 10)), hl
-;main.c:366: cam_pan_up();
-	call	_cam_pan_up
-	jr	00166$
-00147$:
-;main.c:368: else if (SMS_getKeysHeld() & PORT_A_KEY_DOWN && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && camera.pan_dir != DOWN_RIGHT && camera.pan_dir != DOWN_LEFT && camera.pan_dir != UP_RIGHT && camera.pan_dir != UP_LEFT)
-	call	_SMS_getKeysHeld
-	bit	1, e
-	jr	Z, 00166$
-	call	_SMS_getKeysHeld
-	bit	2, e
-	jr	NZ, 00166$
-	call	_SMS_getKeysHeld
-	bit	3, e
-	jr	NZ, 00166$
-	ld	hl, (#(_camera + 10) + 0)
-	ld	a, l
-	sub	a, #0x04
-	or	a, h
-	jr	Z, 00166$
-	ld	a, l
-	sub	a, #0x05
-	or	a, h
-	jr	Z, 00166$
-	ld	a, l
-	sub	a, #0x07
-	or	a, h
-	jr	Z, 00166$
-	ld	a, l
-	sub	a, #0x06
-	or	a, h
-	jr	Z, 00166$
-;main.c:370: camera.pan_dir = DOWN;
-	ld	hl, #0x0003
-	ld	((_camera + 10)), hl
-;main.c:371: cam_pan_down();
-	call	_cam_pan_down
-00166$:
-;main.c:373: SMS_waitForVBlank();
+00108$:
+;main.c:284: SMS_waitForVBlank();
 	call	_SMS_waitForVBlank
-;main.c:375: SMS_setBGScrollX(camera.scroll_x);
+;main.c:286: SMS_setBGScrollX(camera.scroll_x);
 	ld	hl, #_camera + 4
 	ld	l, (hl)
 ;	spillPairReg hl
 	call	_SMS_setBGScrollX
-;main.c:376: SMS_setBGScrollY(camera.scroll_y);
+;main.c:287: SMS_setBGScrollY(camera.scroll_y);
 	ld	hl, #_camera + 5
 	ld	l, (hl)
 ;	spillPairReg hl
 	call	_SMS_setBGScrollY
-;main.c:377: SMS_initSprites();
+;main.c:288: SMS_initSprites();
 	call	_SMS_initSprites
-;main.c:378: SMS_copySpritestoSAT();
+;main.c:290: SMS_copySpritestoSAT();
 	call	_SMS_copySpritestoSAT
-;main.c:381: }
-	jp	00174$
+;main.c:293: }
+	jr	00110$
 	.area _CODE
 __str_0:
 	.ascii "OrangeRevolt"
@@ -1972,8 +1104,6 @@ __str_2:
 	.ascii "8 way smooth scrolling example."
 	.db 0x00
 	.area _INITIALIZER
-__xinit__order_time:
-	.dw #0x0000
 	.area _CABS (ABS)
 	.org 0x7FF0
 ___SMS__SEGA_signature:

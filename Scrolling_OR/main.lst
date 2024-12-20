@@ -37,2001 +37,1131 @@
                                      37 	.globl _SMS_setBGScrollX
                                      38 	.globl _SMS_VDPturnOffFeature
                                      39 	.globl _SMS_VDPturnOnFeature
-                                     40 	.globl _order_time
-                                     41 	.globl _camera
-                                     42 	.globl _SMS_SRAM
-                                     43 	.globl _SRAM_bank_to_be_mapped_on_slot2
-                                     44 	.globl _ROM_bank_to_be_mapped_on_slot0
-                                     45 	.globl _ROM_bank_to_be_mapped_on_slot1
-                                     46 	.globl _ROM_bank_to_be_mapped_on_slot2
-                                     47 ;--------------------------------------------------------
-                                     48 ; special function registers
-                                     49 ;--------------------------------------------------------
-                           0000BF    50 _SMS_VDPControlPort	=	0x00bf
-                                     51 ;--------------------------------------------------------
-                                     52 ; ram data
-                                     53 ;--------------------------------------------------------
-                                     54 	.area _DATA
-                           00FFFF    55 _ROM_bank_to_be_mapped_on_slot2	=	0xffff
-                           00FFFE    56 _ROM_bank_to_be_mapped_on_slot1	=	0xfffe
-                           00FFFD    57 _ROM_bank_to_be_mapped_on_slot0	=	0xfffd
-                           00FFFC    58 _SRAM_bank_to_be_mapped_on_slot2	=	0xfffc
-                           008000    59 _SMS_SRAM	=	0x8000
-      000000                         60 _camera::
-      000000                         61 	.ds 12
-                                     62 ;--------------------------------------------------------
-                                     63 ; ram data
-                                     64 ;--------------------------------------------------------
-                                     65 	.area _INITIALIZED
-      000000                         66 _order_time::
-      000000                         67 	.ds 2
-                                     68 ;--------------------------------------------------------
-                                     69 ; absolute external ram data
-                                     70 ;--------------------------------------------------------
-                                     71 	.area _DABS (ABS)
-                                     72 ;--------------------------------------------------------
-                                     73 ; global & static initialisations
-                                     74 ;--------------------------------------------------------
-                                     75 	.area _HOME
-                                     76 	.area _GSINIT
-                                     77 	.area _GSFINAL
-                                     78 	.area _GSINIT
-                                     79 ;--------------------------------------------------------
-                                     80 ; Home
+                                     40 	.globl _camera
+                                     41 	.globl _SMS_SRAM
+                                     42 	.globl _SRAM_bank_to_be_mapped_on_slot2
+                                     43 	.globl _ROM_bank_to_be_mapped_on_slot0
+                                     44 	.globl _ROM_bank_to_be_mapped_on_slot1
+                                     45 	.globl _ROM_bank_to_be_mapped_on_slot2
+                                     46 ;--------------------------------------------------------
+                                     47 ; special function registers
+                                     48 ;--------------------------------------------------------
+                           0000BF    49 _SMS_VDPControlPort	=	0x00bf
+                                     50 ;--------------------------------------------------------
+                                     51 ; ram data
+                                     52 ;--------------------------------------------------------
+                                     53 	.area _DATA
+                           00FFFF    54 _ROM_bank_to_be_mapped_on_slot2	=	0xffff
+                           00FFFE    55 _ROM_bank_to_be_mapped_on_slot1	=	0xfffe
+                           00FFFD    56 _ROM_bank_to_be_mapped_on_slot0	=	0xfffd
+                           00FFFC    57 _SRAM_bank_to_be_mapped_on_slot2	=	0xfffc
+                           008000    58 _SMS_SRAM	=	0x8000
+      000000                         59 _camera::
+      000000                         60 	.ds 10
+                                     61 ;--------------------------------------------------------
+                                     62 ; ram data
+                                     63 ;--------------------------------------------------------
+                                     64 	.area _INITIALIZED
+                                     65 ;--------------------------------------------------------
+                                     66 ; absolute external ram data
+                                     67 ;--------------------------------------------------------
+                                     68 	.area _DABS (ABS)
+                                     69 ;--------------------------------------------------------
+                                     70 ; global & static initialisations
+                                     71 ;--------------------------------------------------------
+                                     72 	.area _HOME
+                                     73 	.area _GSINIT
+                                     74 	.area _GSFINAL
+                                     75 	.area _GSINIT
+                                     76 ;--------------------------------------------------------
+                                     77 ; Home
+                                     78 ;--------------------------------------------------------
+                                     79 	.area _HOME
+                                     80 	.area _HOME
                                      81 ;--------------------------------------------------------
-                                     82 	.area _HOME
-                                     83 	.area _HOME
-                                     84 ;--------------------------------------------------------
-                                     85 ; code
-                                     86 ;--------------------------------------------------------
-                                     87 	.area _CODE
-                                     88 ;main.c:43: void init_camera(void)
-                                     89 ;	---------------------------------
-                                     90 ; Function init_camera
-                                     91 ; ---------------------------------
-      000000                         92 _init_camera::
-                                     93 ;main.c:45: camera.view_x = CAM_START_X; //We can set it to a max of 128, which is at the width end of the tilemap.
-      000000 21 00 00         [10]   94 	ld	hl, #0x0000
-      000003 22r00r00         [16]   95 	ld	(_camera), hl
-                                     96 ;main.c:46: camera.view_y = CAM_START_Y; //We can set it to a max of 24, which is at the height end of the tilemap.
-      000006 22r02r00         [16]   97 	ld	((_camera + 2)), hl
-                                     98 ;main.c:47: camera.scroll_x = 0;
-      000009 01r04r00         [10]   99 	ld	bc, #_camera + 4
-      00000C AF               [ 4]  100 	xor	a, a
-      00000D 02               [ 7]  101 	ld	(bc), a
-                                    102 ;main.c:48: camera.scroll_y = 0;
-      00000E 21r05r00         [10]  103 	ld	hl, #(_camera + 5)
-      000011 36 00            [10]  104 	ld	(hl), #0x00
-                                    105 ;main.c:49: camera.coloffset = 0;
-      000013 21 00 00         [10]  106 	ld	hl, #0x0000
-      000016 22r06r00         [16]  107 	ld	((_camera + 6)), hl
-                                    108 ;main.c:50: camera.rowoffset = 0;
-      000019 22r08r00         [16]  109 	ld	((_camera + 8)), hl
-                                    110 ;main.c:51: camera.pan_dir = -1;
-      00001C 21 FF FF         [10]  111 	ld	hl, #0xffff
-      00001F 22r0Ar00         [16]  112 	ld	((_camera + 10)), hl
-                                    113 ;main.c:52: SMS_setBGScrollX(camera.scroll_x);
-      000022 0A               [ 7]  114 	ld	a, (bc)
-      000023 6F               [ 4]  115 	ld	l, a
+                                     82 ; code
+                                     83 ;--------------------------------------------------------
+                                     84 	.area _CODE
+                                     85 ;main.c:43: void init_camera(void)
+                                     86 ;	---------------------------------
+                                     87 ; Function init_camera
+                                     88 ; ---------------------------------
+      000000                         89 _init_camera::
+                                     90 ;main.c:45: camera.view_x = CAM_START_X; //We can set it to a max of 128, which is at the width end of the tilemap.
+      000000 21 00 00         [10]   91 	ld	hl, #0x0000
+      000003 22r00r00         [16]   92 	ld	(_camera), hl
+                                     93 ;main.c:46: camera.view_y = CAM_START_Y; //We can set it to a max of 24, which is at the height end of the tilemap.
+      000006 22r02r00         [16]   94 	ld	((_camera + 2)), hl
+                                     95 ;main.c:47: camera.scroll_x = 0;
+      000009 01r04r00         [10]   96 	ld	bc, #_camera + 4
+      00000C AF               [ 4]   97 	xor	a, a
+      00000D 02               [ 7]   98 	ld	(bc), a
+                                     99 ;main.c:48: camera.scroll_y = 0;
+      00000E 21r05r00         [10]  100 	ld	hl, #(_camera + 5)
+      000011 36 00            [10]  101 	ld	(hl), #0x00
+                                    102 ;main.c:49: camera.coloffset = 0;
+      000013 21 00 00         [10]  103 	ld	hl, #0x0000
+      000016 22r06r00         [16]  104 	ld	((_camera + 6)), hl
+                                    105 ;main.c:50: camera.rowoffset = 0;
+      000019 22r08r00         [16]  106 	ld	((_camera + 8)), hl
+                                    107 ;main.c:51: SMS_setBGScrollX(camera.scroll_x);
+      00001C 0A               [ 7]  108 	ld	a, (bc)
+      00001D 6F               [ 4]  109 	ld	l, a
+                                    110 ;	spillPairReg hl
+                                    111 ;	spillPairReg hl
+      00001E CDr00r00         [17]  112 	call	_SMS_setBGScrollX
+                                    113 ;main.c:52: SMS_setBGScrollY(camera.scroll_y);
+      000021 21r05r00         [10]  114 	ld	hl, #(_camera + 5)
+      000024 6E               [ 7]  115 	ld	l, (hl)
                                     116 ;	spillPairReg hl
-                                    117 ;	spillPairReg hl
-      000024 CDr00r00         [17]  118 	call	_SMS_setBGScrollX
-                                    119 ;main.c:53: SMS_setBGScrollY(camera.scroll_y);
-      000027 21r05r00         [10]  120 	ld	hl, #(_camera + 5)
-      00002A 6E               [ 7]  121 	ld	l, (hl)
-                                    122 ;	spillPairReg hl
-                                    123 ;main.c:54: }
-      00002B C3r00r00         [10]  124 	jp	_SMS_setBGScrollY
-                                    125 ;main.c:55: void redraw_stage(void)
-                                    126 ;	---------------------------------
-                                    127 ; Function redraw_stage
-                                    128 ; ---------------------------------
-      00002E                        129 _redraw_stage::
-                                    130 ;main.c:57: SMS_mapROMBank(brawl_street_tilemap_bin_bank);
-      00002E 21 FF FF         [10]  131 	ld	hl, #_ROM_bank_to_be_mapped_on_slot2
-      000031 36 03            [10]  132 	ld	(hl), #0x03
-                                    133 ;main.c:58: for(unsigned int y = 0; y < 28; y++) //load the fight stage.
-      000033 01 00 00         [10]  134 	ld	bc, #0x0000
-      000036                        135 00103$:
-      000036 79               [ 4]  136 	ld	a, c
-      000037 D6 1C            [ 7]  137 	sub	a, #0x1c
-      000039 78               [ 4]  138 	ld	a, b
-      00003A DE 00            [ 7]  139 	sbc	a, #0x00
-      00003C D0               [11]  140 	ret	NC
-                                    141 ;main.c:60: SMS_loadTileMap(0,y,brawl_street_tilemap_bin + camera.view_x + (((y + camera.view_y) * 96) * 2), 64); //96 * 2 == the tilemap width in tiles (3 screens.)
-      00003D ED 5Br00r00      [20]  142 	ld	de, (#_camera + 0)
-      000041 21r00r00         [10]  143 	ld	hl, #_brawl_street_tilemap_bin
-      000044 19               [11]  144 	add	hl, de
-      000045 EB               [ 4]  145 	ex	de, hl
-      000046 2Ar02r00         [16]  146 	ld	hl, (#(_camera + 2) + 0)
-      000049 09               [11]  147 	add	hl, bc
-      00004A D5               [11]  148 	push	de
-      00004B 5D               [ 4]  149 	ld	e, l
-      00004C 54               [ 4]  150 	ld	d, h
+                                    117 ;main.c:53: }
+      000025 C3r00r00         [10]  118 	jp	_SMS_setBGScrollY
+                                    119 ;main.c:54: void redraw_stage(void)
+                                    120 ;	---------------------------------
+                                    121 ; Function redraw_stage
+                                    122 ; ---------------------------------
+      000028                        123 _redraw_stage::
+                                    124 ;main.c:56: SMS_mapROMBank(brawl_street_tilemap_bin_bank);
+      000028 21 FF FF         [10]  125 	ld	hl, #_ROM_bank_to_be_mapped_on_slot2
+      00002B 36 03            [10]  126 	ld	(hl), #0x03
+                                    127 ;main.c:57: for(unsigned int y = 0; y < 28; y++) //load the fight stage.
+      00002D 01 00 00         [10]  128 	ld	bc, #0x0000
+      000030                        129 00103$:
+      000030 79               [ 4]  130 	ld	a, c
+      000031 D6 1C            [ 7]  131 	sub	a, #0x1c
+      000033 78               [ 4]  132 	ld	a, b
+      000034 DE 00            [ 7]  133 	sbc	a, #0x00
+      000036 D0               [11]  134 	ret	NC
+                                    135 ;main.c:59: SMS_loadTileMap(0,y,brawl_street_tilemap_bin + camera.view_x + (((y + camera.view_y) * 96) * 2), 64); //96 * 2 == the tilemap width in tiles (3 screens.)
+      000037 ED 5Br00r00      [20]  136 	ld	de, (#_camera + 0)
+      00003B 21r00r00         [10]  137 	ld	hl, #_brawl_street_tilemap_bin
+      00003E 19               [11]  138 	add	hl, de
+      00003F EB               [ 4]  139 	ex	de, hl
+      000040 2Ar02r00         [16]  140 	ld	hl, (#(_camera + 2) + 0)
+      000043 09               [11]  141 	add	hl, bc
+      000044 D5               [11]  142 	push	de
+      000045 5D               [ 4]  143 	ld	e, l
+      000046 54               [ 4]  144 	ld	d, h
+      000047 29               [11]  145 	add	hl, hl
+      000048 19               [11]  146 	add	hl, de
+      000049 29               [11]  147 	add	hl, hl
+      00004A 29               [11]  148 	add	hl, hl
+      00004B 29               [11]  149 	add	hl, hl
+      00004C 29               [11]  150 	add	hl, hl
       00004D 29               [11]  151 	add	hl, hl
-      00004E 19               [11]  152 	add	hl, de
-      00004F 29               [11]  153 	add	hl, hl
-      000050 29               [11]  154 	add	hl, hl
-      000051 29               [11]  155 	add	hl, hl
-      000052 29               [11]  156 	add	hl, hl
-      000053 29               [11]  157 	add	hl, hl
+      00004E 29               [11]  152 	add	hl, hl
+      00004F D1               [10]  153 	pop	de
+      000050 19               [11]  154 	add	hl, de
+      000051 EB               [ 4]  155 	ex	de, hl
+      000052 69               [ 4]  156 	ld	l, c
+      000053 60               [ 4]  157 	ld	h, b
       000054 29               [11]  158 	add	hl, hl
-      000055 D1               [10]  159 	pop	de
-      000056 19               [11]  160 	add	hl, de
-      000057 EB               [ 4]  161 	ex	de, hl
-      000058 69               [ 4]  162 	ld	l, c
-      000059 60               [ 4]  163 	ld	h, b
-      00005A 29               [11]  164 	add	hl, hl
-      00005B 29               [11]  165 	add	hl, hl
-      00005C 29               [11]  166 	add	hl, hl
-      00005D 29               [11]  167 	add	hl, hl
-      00005E 29               [11]  168 	add	hl, hl
-      00005F 29               [11]  169 	add	hl, hl
-      000060 7C               [ 4]  170 	ld	a, h
-      000061 F6 78            [ 7]  171 	or	a, #0x78
-      000063 67               [ 4]  172 	ld	h, a
-                                    173 ;	spillPairReg hl
-                                    174 ;	spillPairReg hl
-      000064 C5               [11]  175 	push	bc
-      000065 01 40 00         [10]  176 	ld	bc, #0x0040
-      000068 C5               [11]  177 	push	bc
-      000069 CDr00r00         [17]  178 	call	_SMS_VRAMmemcpy
-      00006C C1               [10]  179 	pop	bc
-                                    180 ;main.c:58: for(unsigned int y = 0; y < 28; y++) //load the fight stage.
-      00006D 03               [ 6]  181 	inc	bc
-                                    182 ;main.c:63: }
-      00006E 18 C6            [12]  183 	jr	00103$
-                                    184 ;main.c:80: void cam_pan_right(void) 
-                                    185 ;	---------------------------------
-                                    186 ; Function cam_pan_right
-                                    187 ; ---------------------------------
-      000070                        188 _cam_pan_right::
-      000070 DD E5            [15]  189 	push	ix
-      000072 DD 21 00 00      [14]  190 	ld	ix,#0
-      000076 DD 39            [15]  191 	add	ix,sp
-      000078 21 F9 FF         [10]  192 	ld	hl, #-7
-      00007B 39               [11]  193 	add	hl, sp
-      00007C F9               [ 6]  194 	ld	sp, hl
-                                    195 ;main.c:83: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
-      00007D 3Ar04r00         [13]  196 	ld	a, (#(_camera + 4) + 0)
-      000080 E6 07            [ 7]  197 	and	a, #0x07
-                                    198 ;main.c:87: for (unsigned char y = 0; y < 28; y++)
-                                    199 ;main.c:83: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
-      000082 F6 00            [ 7]  200 	or	a,#0x00
-      000084 C2r25r02         [10]  201 	jp	NZ, 00112$
-      000087 21r00r00         [10]  202 	ld	hl, #_camera
-      00008A 7E               [ 7]  203 	ld	a, (hl)
-      00008B DD 77 F9         [19]  204 	ld	-7 (ix), a
-      00008E 23               [ 6]  205 	inc	hl
-      00008F 7E               [ 7]  206 	ld	a, (hl)
-      000090 DD 77 FA         [19]  207 	ld	-6 (ix), a
-      000093 DD 7E F9         [19]  208 	ld	a, -7 (ix)
-      000096 D6 80            [ 7]  209 	sub	a, #0x80
-      000098 DD 7E FA         [19]  210 	ld	a, -6 (ix)
-      00009B DE 00            [ 7]  211 	sbc	a, #0x00
-      00009D D2r25r02         [10]  212 	jp	NC, 00112$
-                                    213 ;main.c:85: if (camera.rowoffset == 0) //No offset on the row, so we don't need to split the row code.
-      0000A0 21r08r00         [10]  214 	ld	hl, #(_camera + 8)
-      0000A3 7E               [ 7]  215 	ld	a, (hl)
-      0000A4 DD 77 FE         [19]  216 	ld	-2 (ix), a
-      0000A7 23               [ 6]  217 	inc	hl
-      0000A8 7E               [ 7]  218 	ld	a, (hl)
-                                    219 ;main.c:87: for (unsigned char y = 0; y < 28; y++)
-                                    220 ;main.c:85: if (camera.rowoffset == 0) //No offset on the row, so we don't need to split the row code.
-      0000A9 DD 77 FF         [19]  221 	ld	-1 (ix), a
-      0000AC DD B6 FE         [19]  222 	or	a, -2 (ix)
-      0000AF 20 63            [12]  223 	jr	NZ, 00109$
-                                    224 ;main.c:87: for (unsigned char y = 0; y < 28; y++)
-      0000B1 DD 36 FF 00      [19]  225 	ld	-1 (ix), #0x00
-      0000B5                        226 00121$:
-                                    227 ;main.c:83: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
-      0000B5 21r00r00         [10]  228 	ld	hl, #_camera
-      0000B8 7E               [ 7]  229 	ld	a, (hl)
-      0000B9 DD 77 F9         [19]  230 	ld	-7 (ix), a
-      0000BC 23               [ 6]  231 	inc	hl
-      0000BD 7E               [ 7]  232 	ld	a, (hl)
-      0000BE DD 77 FA         [19]  233 	ld	-6 (ix), a
-                                    234 ;main.c:87: for (unsigned char y = 0; y < 28; y++)
-      0000C1 DD 7E FF         [19]  235 	ld	a, -1 (ix)
-      0000C4 D6 1C            [ 7]  236 	sub	a, #0x1c
-      0000C6 D2r1Dr02         [10]  237 	jp	NC, 00110$
-                                    238 ;main.c:89: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x + 64) + (((y + camera.view_y) * 96) * 2),2);
-      0000C9 DD 7E F9         [19]  239 	ld	a, -7 (ix)
-      0000CC C6 40            [ 7]  240 	add	a, #0x40
-      0000CE 4F               [ 4]  241 	ld	c, a
-      0000CF DD 7E FA         [19]  242 	ld	a, -6 (ix)
-      0000D2 CE 00            [ 7]  243 	adc	a, #0x00
-      0000D4 47               [ 4]  244 	ld	b, a
-      0000D5 21r00r00         [10]  245 	ld	hl, #_brawl_street_tilemap_bin
-      0000D8 09               [11]  246 	add	hl, bc
-      0000D9 EB               [ 4]  247 	ex	de, hl
-      0000DA DD 4E FF         [19]  248 	ld	c, -1 (ix)
-      0000DD 06 00            [ 7]  249 	ld	b, #0x00
-      0000DF 2Ar02r00         [16]  250 	ld	hl, (#(_camera + 2) + 0)
-      0000E2 09               [11]  251 	add	hl, bc
-      0000E3 D5               [11]  252 	push	de
-      0000E4 5D               [ 4]  253 	ld	e, l
-      0000E5 54               [ 4]  254 	ld	d, h
-      0000E6 29               [11]  255 	add	hl, hl
-      0000E7 19               [11]  256 	add	hl, de
-      0000E8 29               [11]  257 	add	hl, hl
-      0000E9 29               [11]  258 	add	hl, hl
-      0000EA 29               [11]  259 	add	hl, hl
-      0000EB 29               [11]  260 	add	hl, hl
-      0000EC 29               [11]  261 	add	hl, hl
-      0000ED 29               [11]  262 	add	hl, hl
-      0000EE D1               [10]  263 	pop	de
-      0000EF 19               [11]  264 	add	hl, de
-      0000F0 EB               [ 4]  265 	ex	de, hl
-      0000F1 2Ar08r00         [16]  266 	ld	hl, (#(_camera + 8) + 0)
-      0000F4 09               [11]  267 	add	hl, bc
-      0000F5 29               [11]  268 	add	hl, hl
-      0000F6 29               [11]  269 	add	hl, hl
-      0000F7 29               [11]  270 	add	hl, hl
-      0000F8 29               [11]  271 	add	hl, hl
-      0000F9 29               [11]  272 	add	hl, hl
-      0000FA 4D               [ 4]  273 	ld	c, l
-      0000FB 44               [ 4]  274 	ld	b, h
-      0000FC 3Ar06r00         [13]  275 	ld	a, (#(_camera + 6) + 0)
-      0000FF 6F               [ 4]  276 	ld	l, a
-                                    277 ;	spillPairReg hl
-                                    278 ;	spillPairReg hl
-      000100 26 00            [ 7]  279 	ld	h, #0x00
-                                    280 ;	spillPairReg hl
-                                    281 ;	spillPairReg hl
-      000102 09               [11]  282 	add	hl, bc
-      000103 29               [11]  283 	add	hl, hl
-      000104 7C               [ 4]  284 	ld	a, h
-      000105 F6 78            [ 7]  285 	or	a, #0x78
-      000107 67               [ 4]  286 	ld	h, a
+      000055 29               [11]  159 	add	hl, hl
+      000056 29               [11]  160 	add	hl, hl
+      000057 29               [11]  161 	add	hl, hl
+      000058 29               [11]  162 	add	hl, hl
+      000059 29               [11]  163 	add	hl, hl
+      00005A 7C               [ 4]  164 	ld	a, h
+      00005B F6 78            [ 7]  165 	or	a, #0x78
+      00005D 67               [ 4]  166 	ld	h, a
+                                    167 ;	spillPairReg hl
+                                    168 ;	spillPairReg hl
+      00005E C5               [11]  169 	push	bc
+      00005F 01 40 00         [10]  170 	ld	bc, #0x0040
+      000062 C5               [11]  171 	push	bc
+      000063 CDr00r00         [17]  172 	call	_SMS_VRAMmemcpy
+      000066 C1               [10]  173 	pop	bc
+                                    174 ;main.c:57: for(unsigned int y = 0; y < 28; y++) //load the fight stage.
+      000067 03               [ 6]  175 	inc	bc
+                                    176 ;main.c:62: }
+      000068 18 C6            [12]  177 	jr	00103$
+                                    178 ;main.c:64: void cam_pan_right(void) 
+                                    179 ;	---------------------------------
+                                    180 ; Function cam_pan_right
+                                    181 ; ---------------------------------
+      00006A                        182 _cam_pan_right::
+      00006A DD E5            [15]  183 	push	ix
+      00006C DD 21 00 00      [14]  184 	ld	ix,#0
+      000070 DD 39            [15]  185 	add	ix,sp
+      000072 21 FA FF         [10]  186 	ld	hl, #-6
+      000075 39               [11]  187 	add	hl, sp
+      000076 F9               [ 6]  188 	ld	sp, hl
+                                    189 ;main.c:67: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
+      000077 3Ar04r00         [13]  190 	ld	a, (#(_camera + 4) + 0)
+      00007A E6 07            [ 7]  191 	and	a, #0x07
+                                    192 ;main.c:74: for (unsigned char y = 0; y < 28; y++)
+                                    193 ;main.c:67: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
+      00007C F6 00            [ 7]  194 	or	a,#0x00
+      00007E C2r59r01         [10]  195 	jp	NZ, 00106$
+      000081 2Ar00r00         [16]  196 	ld	hl, (#_camera + 0)
+      000084 11 80 00         [10]  197 	ld	de, #0x0080
+      000087 BF               [ 4]  198 	cp	a, a
+      000088 ED 52            [15]  199 	sbc	hl, de
+      00008A D2r59r01         [10]  200 	jp	NC, 00106$
+                                    201 ;main.c:69: camera.rowoffset = (camera.scroll_y / 8);
+      00008D 3Ar05r00         [13]  202 	ld	a, (#_camera + 5)
+      000090 4F               [ 4]  203 	ld	c, a
+      000091 06 00            [ 7]  204 	ld	b, #0x00
+      000093 CB 28            [ 8]  205 	sra	b
+      000095 CB 19            [ 8]  206 	rr	c
+      000097 CB 28            [ 8]  207 	sra	b
+      000099 CB 19            [ 8]  208 	rr	c
+      00009B CB 28            [ 8]  209 	sra	b
+      00009D CB 19            [ 8]  210 	rr	c
+      00009F ED 43r08r00      [20]  211 	ld	((_camera + 8)), bc
+                                    212 ;main.c:71: unsigned char rowoffset = camera.rowoffset; //Save the last state of rowoffset in a temp variable.
+                                    213 ;main.c:72: unsigned char ydex = 0; //We store the current y loop position, in order to subtract from the loop, to start at zero again when at last tile position.
+      0000A3 DD 36 FA 00      [19]  214 	ld	-6 (ix), #0x00
+                                    215 ;main.c:74: for (unsigned char y = 0; y < 28; y++)
+      0000A7 DD 36 FF 00      [19]  216 	ld	-1 (ix), #0x00
+      0000AB                        217 00115$:
+                                    218 ;main.c:67: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
+      0000AB 21r00r00         [10]  219 	ld	hl, #_camera
+      0000AE 7E               [ 7]  220 	ld	a, (hl)
+      0000AF DD 77 FB         [19]  221 	ld	-5 (ix), a
+      0000B2 23               [ 6]  222 	inc	hl
+      0000B3 7E               [ 7]  223 	ld	a, (hl)
+      0000B4 DD 77 FC         [19]  224 	ld	-4 (ix), a
+                                    225 ;main.c:74: for (unsigned char y = 0; y < 28; y++)
+      0000B7 DD 7E FF         [19]  226 	ld	a, -1 (ix)
+      0000BA D6 1C            [ 7]  227 	sub	a, #0x1c
+      0000BC D2r4Dr01         [10]  228 	jp	NC, 00104$
+                                    229 ;main.c:76: if (y >= 28 - rowoffset && rowoffset != 0)//When screen is offset, as the loop reaches the edge of the screen, we need to reset the loop so it begins at zero to finish off tiling.
+      0000BF 59               [ 4]  230 	ld	e, c
+      0000C0 16 00            [ 7]  231 	ld	d, #0x00
+      0000C2 21 1C 00         [10]  232 	ld	hl, #0x001c
+      0000C5 BF               [ 4]  233 	cp	a, a
+      0000C6 ED 52            [15]  234 	sbc	hl, de
+      0000C8 DD 7E FF         [19]  235 	ld	a, -1 (ix)
+      0000CB DD 77 FD         [19]  236 	ld	-3 (ix), a
+      0000CE DD 36 FE 00      [19]  237 	ld	-2 (ix), #0x00
+      0000D2 DD 7E FD         [19]  238 	ld	a, -3 (ix)
+      0000D5 95               [ 4]  239 	sub	a, l
+      0000D6 DD 7E FE         [19]  240 	ld	a, -2 (ix)
+      0000D9 9C               [ 4]  241 	sbc	a, h
+      0000DA E2rDFr00         [10]  242 	jp	PO, 00189$
+      0000DD EE 80            [ 7]  243 	xor	a, #0x80
+      0000DF                        244 00189$:
+      0000DF FArEEr00         [10]  245 	jp	M, 00102$
+      0000E2 79               [ 4]  246 	ld	a, c
+      0000E3 B7               [ 4]  247 	or	a, a
+      0000E4 28 08            [12]  248 	jr	Z, 00102$
+                                    249 ;main.c:78: rowoffset = 0; //removes the offset from the equation. we need to start at zero.
+      0000E6 0E 00            [ 7]  250 	ld	c, #0x00
+                                    251 ;main.c:79: ydex = y; //store the y loop current index, to subtract it.
+      0000E8 DD 7E FF         [19]  252 	ld	a, -1 (ix)
+      0000EB DD 77 FA         [19]  253 	ld	-6 (ix), a
+      0000EE                        254 00102$:
+                                    255 ;main.c:81: SMS_loadTileMap(camera.coloffset,rowoffset + (y - ydex),brawl_street_tilemap_bin + (camera.view_x + 64) + (((y + camera.view_y) * 96) * 2),2);
+      0000EE DD 6E FB         [19]  256 	ld	l, -5 (ix)
+                                    257 ;	spillPairReg hl
+                                    258 ;	spillPairReg hl
+      0000F1 DD 66 FC         [19]  259 	ld	h, -4 (ix)
+                                    260 ;	spillPairReg hl
+                                    261 ;	spillPairReg hl
+      0000F4 11 40 00         [10]  262 	ld	de, #0x0040
+      0000F7 19               [11]  263 	add	hl, de
+      0000F8 FD 21r00r00      [14]  264 	ld	iy, #_brawl_street_tilemap_bin
+      0000FC EB               [ 4]  265 	ex	de, hl
+      0000FD FD 19            [15]  266 	add	iy, de
+      0000FF 2Ar02r00         [16]  267 	ld	hl, (#_camera + 2)
+      000102 DD 5E FD         [19]  268 	ld	e, -3 (ix)
+      000105 DD 56 FE         [19]  269 	ld	d, -2 (ix)
+      000108 19               [11]  270 	add	hl, de
+      000109 5D               [ 4]  271 	ld	e, l
+      00010A 54               [ 4]  272 	ld	d, h
+      00010B 29               [11]  273 	add	hl, hl
+      00010C 19               [11]  274 	add	hl, de
+      00010D 29               [11]  275 	add	hl, hl
+      00010E 29               [11]  276 	add	hl, hl
+      00010F 29               [11]  277 	add	hl, hl
+      000110 29               [11]  278 	add	hl, hl
+      000111 29               [11]  279 	add	hl, hl
+      000112 29               [11]  280 	add	hl, hl
+      000113 EB               [ 4]  281 	ex	de, hl
+      000114 FD 19            [15]  282 	add	iy, de
+      000116 59               [ 4]  283 	ld	e, c
+      000117 16 00            [ 7]  284 	ld	d, #0x00
+      000119 DD 6E FA         [19]  285 	ld	l, -6 (ix)
+                                    286 ;	spillPairReg hl
                                     287 ;	spillPairReg hl
-                                    288 ;	spillPairReg hl
-      000108 01 02 00         [10]  289 	ld	bc, #0x0002
-      00010B C5               [11]  290 	push	bc
-      00010C CDr00r00         [17]  291 	call	_SMS_VRAMmemcpy
-                                    292 ;main.c:87: for (unsigned char y = 0; y < 28; y++)
-      00010F DD 34 FF         [23]  293 	inc	-1 (ix)
-      000112 18 A1            [12]  294 	jr	00121$
-      000114                        295 00109$:
-                                    296 ;main.c:92: else if (camera.rowoffset != 0)
-      000114 DD 7E FF         [19]  297 	ld	a, -1 (ix)
-      000117 DD B6 FE         [19]  298 	or	a, -2 (ix)
-      00011A CAr1Dr02         [10]  299 	jp	Z, 00110$
-                                    300 ;main.c:94: camera.rowoffset = (camera.scroll_y / 8);
-      00011D 3Ar05r00         [13]  301 	ld	a, (#(_camera + 5) + 0)
-      000120 4F               [ 4]  302 	ld	c, a
-      000121 06 00            [ 7]  303 	ld	b, #0x00
-      000123 CB 28            [ 8]  304 	sra	b
-      000125 CB 19            [ 8]  305 	rr	c
-      000127 CB 28            [ 8]  306 	sra	b
-      000129 CB 19            [ 8]  307 	rr	c
-      00012B CB 28            [ 8]  308 	sra	b
-      00012D CB 19            [ 8]  309 	rr	c
-      00012F ED 43r08r00      [20]  310 	ld	((_camera + 8)), bc
-                                    311 ;main.c:95: for (unsigned char y = 0; y < 28; y++)
-      000133 DD 36 FF 00      [19]  312 	ld	-1 (ix), #0x00
-      000137                        313 00124$:
-                                    314 ;main.c:83: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
-      000137 21r00r00         [10]  315 	ld	hl, #_camera
-      00013A 7E               [ 7]  316 	ld	a, (hl)
-      00013B DD 77 F9         [19]  317 	ld	-7 (ix), a
-      00013E 23               [ 6]  318 	inc	hl
-      00013F 7E               [ 7]  319 	ld	a, (hl)
-      000140 DD 77 FA         [19]  320 	ld	-6 (ix), a
-                                    321 ;main.c:95: for (unsigned char y = 0; y < 28; y++)
-      000143 DD 7E FF         [19]  322 	ld	a, -1 (ix)
-      000146 D6 1C            [ 7]  323 	sub	a, #0x1c
-      000148 D2r1Dr02         [10]  324 	jp	NC, 00110$
-                                    325 ;main.c:98: if (y < 28 - (camera.scroll_y / 8)) 
-      00014B 3Ar05r00         [13]  326 	ld	a, (#(_camera + 5) + 0)
-      00014E 4F               [ 4]  327 	ld	c, a
-      00014F 06 00            [ 7]  328 	ld	b, #0x00
-      000151 CB 28            [ 8]  329 	sra	b
-      000153 CB 19            [ 8]  330 	rr	c
-      000155 CB 28            [ 8]  331 	sra	b
-      000157 CB 19            [ 8]  332 	rr	c
-      000159 CB 28            [ 8]  333 	sra	b
-      00015B CB 19            [ 8]  334 	rr	c
-      00015D 21 1C 00         [10]  335 	ld	hl, #0x001c
-      000160 BF               [ 4]  336 	cp	a, a
-      000161 ED 42            [15]  337 	sbc	hl, bc
-      000163 EB               [ 4]  338 	ex	de, hl
-      000164 DD 4E FF         [19]  339 	ld	c, -1 (ix)
-      000167 06 00            [ 7]  340 	ld	b, #0x00
-                                    341 ;main.c:85: if (camera.rowoffset == 0) //No offset on the row, so we don't need to split the row code.
-      000169 21r08r00         [10]  342 	ld	hl, #(_camera + 8)
-      00016C 7E               [ 7]  343 	ld	a, (hl)
-      00016D DD 77 FB         [19]  344 	ld	-5 (ix), a
-      000170 23               [ 6]  345 	inc	hl
-      000171 7E               [ 7]  346 	ld	a, (hl)
-      000172 DD 77 FC         [19]  347 	ld	-4 (ix), a
-                                    348 ;main.c:89: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x + 64) + (((y + camera.view_y) * 96) * 2),2);
-      000175 DD 7E F9         [19]  349 	ld	a, -7 (ix)
-      000178 C6 40            [ 7]  350 	add	a, #0x40
-      00017A DD 77 FD         [19]  351 	ld	-3 (ix), a
-      00017D DD 7E FA         [19]  352 	ld	a, -6 (ix)
-      000180 CE 00            [ 7]  353 	adc	a, #0x00
-      000182 DD 77 FE         [19]  354 	ld	-2 (ix), a
-                                    355 ;main.c:98: if (y < 28 - (camera.scroll_y / 8)) 
-      000185 79               [ 4]  356 	ld	a, c
-      000186 93               [ 4]  357 	sub	a, e
-      000187 78               [ 4]  358 	ld	a, b
-      000188 9A               [ 4]  359 	sbc	a, d
-      000189 E2r8Er01         [10]  360 	jp	PO, 00223$
-      00018C EE 80            [ 7]  361 	xor	a, #0x80
-      00018E                        362 00223$:
-      00018E F2rD2r01         [10]  363 	jp	P, 00103$
-                                    364 ;main.c:100: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x + 64) + (((y + camera.view_y) * 96) * 2),2);
-      000191 DD 7E FD         [19]  365 	ld	a, -3 (ix)
-      000194 C6r00            [ 7]  366 	add	a, #<(_brawl_street_tilemap_bin)
-      000196 5F               [ 4]  367 	ld	e, a
-      000197 DD 7E FE         [19]  368 	ld	a, -2 (ix)
-      00019A CEs00            [ 7]  369 	adc	a, #>(_brawl_street_tilemap_bin)
-      00019C 57               [ 4]  370 	ld	d, a
-      00019D 2Ar02r00         [16]  371 	ld	hl, (#(_camera + 2) + 0)
-      0001A0 09               [11]  372 	add	hl, bc
-      0001A1 D5               [11]  373 	push	de
-      0001A2 5D               [ 4]  374 	ld	e, l
-      0001A3 54               [ 4]  375 	ld	d, h
-      0001A4 29               [11]  376 	add	hl, hl
-      0001A5 19               [11]  377 	add	hl, de
-      0001A6 29               [11]  378 	add	hl, hl
-      0001A7 29               [11]  379 	add	hl, hl
-      0001A8 29               [11]  380 	add	hl, hl
-      0001A9 29               [11]  381 	add	hl, hl
-      0001AA 29               [11]  382 	add	hl, hl
-      0001AB 29               [11]  383 	add	hl, hl
-      0001AC D1               [10]  384 	pop	de
-      0001AD 19               [11]  385 	add	hl, de
-      0001AE EB               [ 4]  386 	ex	de, hl
-      0001AF DD 6E FB         [19]  387 	ld	l, -5 (ix)
-                                    388 ;	spillPairReg hl
-                                    389 ;	spillPairReg hl
-      0001B2 DD 66 FC         [19]  390 	ld	h, -4 (ix)
-                                    391 ;	spillPairReg hl
-                                    392 ;	spillPairReg hl
-      0001B5 09               [11]  393 	add	hl, bc
-      0001B6 29               [11]  394 	add	hl, hl
-      0001B7 29               [11]  395 	add	hl, hl
-      0001B8 29               [11]  396 	add	hl, hl
-      0001B9 29               [11]  397 	add	hl, hl
-      0001BA 29               [11]  398 	add	hl, hl
-      0001BB 4D               [ 4]  399 	ld	c, l
-      0001BC 44               [ 4]  400 	ld	b, h
-      0001BD 3Ar06r00         [13]  401 	ld	a, (#(_camera + 6) + 0)
-      0001C0 6F               [ 4]  402 	ld	l, a
-                                    403 ;	spillPairReg hl
-                                    404 ;	spillPairReg hl
-      0001C1 26 00            [ 7]  405 	ld	h, #0x00
-                                    406 ;	spillPairReg hl
-                                    407 ;	spillPairReg hl
-      0001C3 09               [11]  408 	add	hl, bc
-      0001C4 29               [11]  409 	add	hl, hl
-      0001C5 7C               [ 4]  410 	ld	a, h
-      0001C6 F6 78            [ 7]  411 	or	a, #0x78
-      0001C8 67               [ 4]  412 	ld	h, a
-                                    413 ;	spillPairReg hl
-                                    414 ;	spillPairReg hl
-      0001C9 01 02 00         [10]  415 	ld	bc, #0x0002
-      0001CC C5               [11]  416 	push	bc
-      0001CD CDr00r00         [17]  417 	call	_SMS_VRAMmemcpy
-      0001D0 18 45            [12]  418 	jr	00125$
-      0001D2                        419 00103$:
-                                    420 ;main.c:104: SMS_loadTileMap(camera.coloffset,camera.rowoffset - 28 + y,brawl_street_tilemap_bin + (camera.view_x + 64) + (((y + camera.view_y) * 96) * 2),2);
-      0001D2 3Er00            [ 7]  421 	ld	a, #<(_brawl_street_tilemap_bin)
-      0001D4 DD 86 FD         [19]  422 	add	a, -3 (ix)
-      0001D7 5F               [ 4]  423 	ld	e, a
-      0001D8 3Es00            [ 7]  424 	ld	a, #>(_brawl_street_tilemap_bin)
-      0001DA DD 8E FE         [19]  425 	adc	a, -2 (ix)
-      0001DD 57               [ 4]  426 	ld	d, a
-      0001DE 2Ar02r00         [16]  427 	ld	hl, (#(_camera + 2) + 0)
-      0001E1 09               [11]  428 	add	hl, bc
-      0001E2 D5               [11]  429 	push	de
-      0001E3 5D               [ 4]  430 	ld	e, l
-      0001E4 54               [ 4]  431 	ld	d, h
-      0001E5 29               [11]  432 	add	hl, hl
-      0001E6 19               [11]  433 	add	hl, de
-      0001E7 29               [11]  434 	add	hl, hl
-      0001E8 29               [11]  435 	add	hl, hl
-      0001E9 29               [11]  436 	add	hl, hl
-      0001EA 29               [11]  437 	add	hl, hl
-      0001EB 29               [11]  438 	add	hl, hl
-      0001EC 29               [11]  439 	add	hl, hl
-      0001ED D1               [10]  440 	pop	de
-      0001EE 19               [11]  441 	add	hl, de
-      0001EF EB               [ 4]  442 	ex	de, hl
-      0001F0 DD 7E FB         [19]  443 	ld	a, -5 (ix)
-      0001F3 C6 E4            [ 7]  444 	add	a, #0xe4
-      0001F5 6F               [ 4]  445 	ld	l, a
-                                    446 ;	spillPairReg hl
-                                    447 ;	spillPairReg hl
-      0001F6 DD 7E FC         [19]  448 	ld	a, -4 (ix)
-      0001F9 CE FF            [ 7]  449 	adc	a, #0xff
-      0001FB 67               [ 4]  450 	ld	h, a
-                                    451 ;	spillPairReg hl
-                                    452 ;	spillPairReg hl
-      0001FC 09               [11]  453 	add	hl, bc
-      0001FD 29               [11]  454 	add	hl, hl
-      0001FE 29               [11]  455 	add	hl, hl
-      0001FF 29               [11]  456 	add	hl, hl
-      000200 29               [11]  457 	add	hl, hl
-      000201 29               [11]  458 	add	hl, hl
-      000202 4D               [ 4]  459 	ld	c, l
-      000203 44               [ 4]  460 	ld	b, h
-      000204 3Ar06r00         [13]  461 	ld	a, (#(_camera + 6) + 0)
-      000207 26 00            [ 7]  462 	ld	h, #0x00
-                                    463 ;	spillPairReg hl
-                                    464 ;	spillPairReg hl
-      000209 6F               [ 4]  465 	ld	l, a
-                                    466 ;	spillPairReg hl
-                                    467 ;	spillPairReg hl
-      00020A 09               [11]  468 	add	hl, bc
-      00020B 29               [11]  469 	add	hl, hl
-      00020C 7C               [ 4]  470 	ld	a, h
-      00020D F6 78            [ 7]  471 	or	a, #0x78
-      00020F 67               [ 4]  472 	ld	h, a
-                                    473 ;	spillPairReg hl
-                                    474 ;	spillPairReg hl
-      000210 01 02 00         [10]  475 	ld	bc, #0x0002
-      000213 C5               [11]  476 	push	bc
-      000214 CDr00r00         [17]  477 	call	_SMS_VRAMmemcpy
-      000217                        478 00125$:
-                                    479 ;main.c:95: for (unsigned char y = 0; y < 28; y++)
-      000217 DD 34 FF         [23]  480 	inc	-1 (ix)
-      00021A C3r37r01         [10]  481 	jp	00124$
-      00021D                        482 00110$:
-                                    483 ;main.c:109: camera.view_x+= 2;
-      00021D C1               [10]  484 	pop	bc
-      00021E C5               [11]  485 	push	bc
-      00021F 03               [ 6]  486 	inc	bc
-      000220 03               [ 6]  487 	inc	bc
-      000221 ED 43r00r00      [20]  488 	ld	(_camera), bc
-      000225                        489 00112$:
-                                    490 ;main.c:83: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
-      000225 2Ar00r00         [16]  491 	ld	hl, (#_camera + 0)
-      000228 11 80 00         [10]  492 	ld	de, #0x0080
-      00022B BF               [ 4]  493 	cp	a, a
-      00022C ED 52            [15]  494 	sbc	hl, de
-      00022E 3E 00            [ 7]  495 	ld	a, #0x00
-      000230 17               [ 4]  496 	rla
-                                    497 ;main.c:111: if (camera.view_x < 128 || camera.view_x >= 128 && camera.scroll_x % 32 != 0)
-      000231 B7               [ 4]  498 	or	a, a
-      000232 20 0C            [12]  499 	jr	NZ, 00114$
-      000234 4F               [ 4]  500 	ld	c, a
-      000235 CB 41            [ 8]  501 	bit	0, c
-      000237 20 28            [12]  502 	jr	NZ, 00115$
-      000239 3Ar04r00         [13]  503 	ld	a, (#(_camera + 4) + 0)
-      00023C E6 1F            [ 7]  504 	and	a, #0x1f
-      00023E 28 21            [12]  505 	jr	Z, 00115$
-      000240                        506 00114$:
-                                    507 ;main.c:113: camera.scroll_x--;
-      000240 3Ar04r00         [13]  508 	ld	a, (#(_camera + 4) + 0)
-      000243 3D               [ 4]  509 	dec	a
-      000244 32r04r00         [13]  510 	ld	(#(_camera + 4)),a
-                                    511 ;main.c:114: camera.coloffset = 32 - (camera.scroll_x / 8); //Get the position of the x scroll register in tiles.
-      000247 4F               [ 4]  512 	ld	c, a
-      000248 06 00            [ 7]  513 	ld	b, #0x00
-      00024A CB 28            [ 8]  514 	sra	b
-      00024C CB 19            [ 8]  515 	rr	c
-      00024E CB 28            [ 8]  516 	sra	b
-      000250 CB 19            [ 8]  517 	rr	c
-      000252 CB 28            [ 8]  518 	sra	b
-      000254 CB 19            [ 8]  519 	rr	c
-      000256 3E 20            [ 7]  520 	ld	a, #0x20
-      000258 91               [ 4]  521 	sub	a, c
-      000259 4F               [ 4]  522 	ld	c, a
-      00025A 9F               [ 4]  523 	sbc	a, a
-      00025B 90               [ 4]  524 	sub	a, b
-      00025C 47               [ 4]  525 	ld	b, a
-      00025D ED 43r06r00      [20]  526 	ld	((_camera + 6)), bc
-      000261                        527 00115$:
-                                    528 ;main.c:118: if (camera.coloffset == 32)
-      000261 2Ar06r00         [16]  529 	ld	hl, (#(_camera + 6) + 0)
-      000264 7D               [ 4]  530 	ld	a, l
-      000265 D6 20            [ 7]  531 	sub	a, #0x20
-      000267 B4               [ 4]  532 	or	a, h
-      000268 20 06            [12]  533 	jr	NZ, 00126$
-                                    534 ;main.c:120: camera.coloffset = 0;
-      00026A 21 00 00         [10]  535 	ld	hl, #0x0000
-      00026D 22r06r00         [16]  536 	ld	((_camera + 6)), hl
-      000270                        537 00126$:
-                                    538 ;main.c:123: }
-      000270 DD F9            [10]  539 	ld	sp, ix
-      000272 DD E1            [14]  540 	pop	ix
-      000274 C9               [10]  541 	ret
-                                    542 ;main.c:125: void cam_pan_left(void)
-                                    543 ;	---------------------------------
-                                    544 ; Function cam_pan_left
-                                    545 ; ---------------------------------
-      000275                        546 _cam_pan_left::
-      000275 DD E5            [15]  547 	push	ix
-      000277 DD 21 00 00      [14]  548 	ld	ix,#0
-      00027B DD 39            [15]  549 	add	ix,sp
-      00027D 21 F9 FF         [10]  550 	ld	hl, #-7
-      000280 39               [11]  551 	add	hl, sp
-      000281 F9               [ 6]  552 	ld	sp, hl
-                                    553 ;main.c:127: if (camera.view_x > 0)
-      000282 2Ar00r00         [16]  554 	ld	hl, (#_camera + 0)
-      000285 7C               [ 4]  555 	ld	a, h
-      000286 B5               [ 4]  556 	or	a, l
-      000287 28 06            [12]  557 	jr	Z, 00102$
-                                    558 ;main.c:129: camera.scroll_x++;
-      000289 01r04r00         [10]  559 	ld	bc, #_camera+4
-      00028C 0A               [ 7]  560 	ld	a, (bc)
-      00028D 3C               [ 4]  561 	inc	a
-      00028E 02               [ 7]  562 	ld	(bc), a
-      00028F                        563 00102$:
-                                    564 ;main.c:132: camera.coloffset = 32 - (camera.scroll_x / 8); //Get the position of the x scroll register in tiles.
-      00028F 01r04r00         [10]  565 	ld	bc, #_camera + 4
-      000292 0A               [ 7]  566 	ld	a, (bc)
-      000293 5F               [ 4]  567 	ld	e, a
-      000294 16 00            [ 7]  568 	ld	d, #0x00
-      000296 CB 2A            [ 8]  569 	sra	d
-      000298 CB 1B            [ 8]  570 	rr	e
-      00029A CB 2A            [ 8]  571 	sra	d
-      00029C CB 1B            [ 8]  572 	rr	e
-      00029E CB 2A            [ 8]  573 	sra	d
-      0002A0 CB 1B            [ 8]  574 	rr	e
-      0002A2 21 20 00         [10]  575 	ld	hl, #0x0020
-      0002A5 BF               [ 4]  576 	cp	a, a
-      0002A6 ED 52            [15]  577 	sbc	hl, de
-      0002A8 EB               [ 4]  578 	ex	de, hl
-      0002A9 ED 53r06r00      [20]  579 	ld	((_camera + 6)), de
-                                    580 ;main.c:133: if (camera.coloffset == 32)
-      0002AD 7B               [ 4]  581 	ld	a, e
-      0002AE D6 20            [ 7]  582 	sub	a, #0x20
-      0002B0 B2               [ 4]  583 	or	a, d
-      0002B1 20 06            [12]  584 	jr	NZ, 00104$
-                                    585 ;main.c:135: camera.coloffset = 0;
-      0002B3 21 00 00         [10]  586 	ld	hl, #0x0000
-      0002B6 22r06r00         [16]  587 	ld	((_camera + 6)), hl
-      0002B9                        588 00104$:
-                                    589 ;main.c:139: if (camera.scroll_x % 8 == 0 && camera.view_x > 0)
-      0002B9 0A               [ 7]  590 	ld	a, (bc)
-      0002BA E6 07            [ 7]  591 	and	a, #0x07
-      0002BC C2r64r04         [10]  592 	jp	NZ,00124$
-      0002BF 21r00r00         [10]  593 	ld	hl, #_camera
-      0002C2 7E               [ 7]  594 	ld	a, (hl)
-      0002C3 DD 77 FD         [19]  595 	ld	-3 (ix), a
-      0002C6 23               [ 6]  596 	inc	hl
-      0002C7 7E               [ 7]  597 	ld	a, (hl)
-      0002C8 DD 77 FE         [19]  598 	ld	-2 (ix), a
-      0002CB DD B6 FD         [19]  599 	or	a, -3 (ix)
-      0002CE CAr64r04         [10]  600 	jp	Z, 00124$
-                                    601 ;main.c:141: if (camera.rowoffset == 0)
-      0002D1 21r08r00         [10]  602 	ld	hl, #(_camera + 8)
-      0002D4 7E               [ 7]  603 	ld	a, (hl)
-      0002D5 DD 77 FB         [19]  604 	ld	-5 (ix), a
-      0002D8 23               [ 6]  605 	inc	hl
-      0002D9 7E               [ 7]  606 	ld	a, (hl)
-                                    607 ;main.c:143: for (unsigned char y = 0; y < 28; y++)
-                                    608 ;main.c:141: if (camera.rowoffset == 0)
-      0002DA DD 77 FC         [19]  609 	ld	-4 (ix), a
-      0002DD DD B6 FB         [19]  610 	or	a, -5 (ix)
-      0002E0 20 5F            [12]  611 	jr	NZ, 00113$
-                                    612 ;main.c:143: for (unsigned char y = 0; y < 28; y++)
-      0002E2 DD 36 FF 00      [19]  613 	ld	-1 (ix), #0x00
-      0002E6                        614 00119$:
-                                    615 ;main.c:139: if (camera.scroll_x % 8 == 0 && camera.view_x > 0)
-      0002E6 21r00r00         [10]  616 	ld	hl, #_camera
-      0002E9 7E               [ 7]  617 	ld	a, (hl)
-      0002EA DD 77 FD         [19]  618 	ld	-3 (ix), a
-      0002ED 23               [ 6]  619 	inc	hl
-      0002EE 7E               [ 7]  620 	ld	a, (hl)
-      0002EF DD 77 FE         [19]  621 	ld	-2 (ix), a
-                                    622 ;main.c:143: for (unsigned char y = 0; y < 28; y++)
-      0002F2 DD 7E FF         [19]  623 	ld	a, -1 (ix)
-      0002F5 D6 1C            [ 7]  624 	sub	a, #0x1c
-      0002F7 D2r58r04         [10]  625 	jp	NC, 00114$
-                                    626 ;main.c:145: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);
-      0002FA DD 4E FD         [19]  627 	ld	c, -3 (ix)
-      0002FD DD 46 FE         [19]  628 	ld	b, -2 (ix)
-      000300 0B               [ 6]  629 	dec	bc
-      000301 0B               [ 6]  630 	dec	bc
-      000302 21r00r00         [10]  631 	ld	hl, #_brawl_street_tilemap_bin
-      000305 09               [11]  632 	add	hl, bc
-      000306 EB               [ 4]  633 	ex	de, hl
-      000307 DD 4E FF         [19]  634 	ld	c, -1 (ix)
-      00030A 06 00            [ 7]  635 	ld	b, #0x00
-      00030C 2Ar02r00         [16]  636 	ld	hl, (#(_camera + 2) + 0)
-      00030F 09               [11]  637 	add	hl, bc
-      000310 D5               [11]  638 	push	de
-      000311 5D               [ 4]  639 	ld	e, l
-      000312 54               [ 4]  640 	ld	d, h
-      000313 29               [11]  641 	add	hl, hl
-      000314 19               [11]  642 	add	hl, de
-      000315 29               [11]  643 	add	hl, hl
-      000316 29               [11]  644 	add	hl, hl
-      000317 29               [11]  645 	add	hl, hl
-      000318 29               [11]  646 	add	hl, hl
-      000319 29               [11]  647 	add	hl, hl
-      00031A 29               [11]  648 	add	hl, hl
-      00031B D1               [10]  649 	pop	de
-      00031C 19               [11]  650 	add	hl, de
-      00031D EB               [ 4]  651 	ex	de, hl
-      00031E 2Ar08r00         [16]  652 	ld	hl, (#(_camera + 8) + 0)
-      000321 09               [11]  653 	add	hl, bc
-      000322 29               [11]  654 	add	hl, hl
-      000323 29               [11]  655 	add	hl, hl
-      000324 29               [11]  656 	add	hl, hl
-      000325 29               [11]  657 	add	hl, hl
-      000326 29               [11]  658 	add	hl, hl
-      000327 4D               [ 4]  659 	ld	c, l
-      000328 44               [ 4]  660 	ld	b, h
-      000329 3Ar06r00         [13]  661 	ld	a, (#(_camera + 6) + 0)
-      00032C 6F               [ 4]  662 	ld	l, a
-                                    663 ;	spillPairReg hl
-                                    664 ;	spillPairReg hl
-      00032D 26 00            [ 7]  665 	ld	h, #0x00
-                                    666 ;	spillPairReg hl
-                                    667 ;	spillPairReg hl
-      00032F 09               [11]  668 	add	hl, bc
-      000330 29               [11]  669 	add	hl, hl
-      000331 7C               [ 4]  670 	ld	a, h
-      000332 F6 78            [ 7]  671 	or	a, #0x78
-      000334 67               [ 4]  672 	ld	h, a
-                                    673 ;	spillPairReg hl
-                                    674 ;	spillPairReg hl
-      000335 01 02 00         [10]  675 	ld	bc, #0x0002
-      000338 C5               [11]  676 	push	bc
-      000339 CDr00r00         [17]  677 	call	_SMS_VRAMmemcpy
-                                    678 ;main.c:143: for (unsigned char y = 0; y < 28; y++)
-      00033C DD 34 FF         [23]  679 	inc	-1 (ix)
-      00033F 18 A5            [12]  680 	jr	00119$
-      000341                        681 00113$:
-                                    682 ;main.c:148: else if (camera.rowoffset != 0)
-      000341 DD 7E FC         [19]  683 	ld	a, -4 (ix)
-      000344 DD B6 FB         [19]  684 	or	a, -5 (ix)
-      000347 CAr58r04         [10]  685 	jp	Z, 00114$
-                                    686 ;main.c:150: camera.rowoffset = (camera.scroll_y / 8);
-      00034A 3Ar05r00         [13]  687 	ld	a, (#(_camera + 5) + 0)
-      00034D 4F               [ 4]  688 	ld	c, a
-      00034E 06 00            [ 7]  689 	ld	b, #0x00
-      000350 CB 28            [ 8]  690 	sra	b
-      000352 CB 19            [ 8]  691 	rr	c
-      000354 CB 28            [ 8]  692 	sra	b
-      000356 CB 19            [ 8]  693 	rr	c
-      000358 CB 28            [ 8]  694 	sra	b
-      00035A CB 19            [ 8]  695 	rr	c
-      00035C ED 43r08r00      [20]  696 	ld	((_camera + 8)), bc
-                                    697 ;main.c:151: for (unsigned char y = 0; y < 28; y++)
-      000360 DD 36 FF 00      [19]  698 	ld	-1 (ix), #0x00
-      000364                        699 00122$:
-                                    700 ;main.c:139: if (camera.scroll_x % 8 == 0 && camera.view_x > 0)
-      000364 21r00r00         [10]  701 	ld	hl, #_camera
-      000367 7E               [ 7]  702 	ld	a, (hl)
-      000368 DD 77 FD         [19]  703 	ld	-3 (ix), a
-      00036B 23               [ 6]  704 	inc	hl
-      00036C 7E               [ 7]  705 	ld	a, (hl)
-      00036D DD 77 FE         [19]  706 	ld	-2 (ix), a
-                                    707 ;main.c:151: for (unsigned char y = 0; y < 28; y++)
-      000370 DD 7E FF         [19]  708 	ld	a, -1 (ix)
-      000373 D6 1C            [ 7]  709 	sub	a, #0x1c
-      000375 D2r58r04         [10]  710 	jp	NC, 00114$
-                                    711 ;main.c:154: if (y < 28 - (camera.scroll_y / 8)) 
-      000378 3Ar05r00         [13]  712 	ld	a, (#(_camera + 5) + 0)
-      00037B 4F               [ 4]  713 	ld	c, a
-      00037C 06 00            [ 7]  714 	ld	b, #0x00
-      00037E CB 28            [ 8]  715 	sra	b
-      000380 CB 19            [ 8]  716 	rr	c
-      000382 CB 28            [ 8]  717 	sra	b
-      000384 CB 19            [ 8]  718 	rr	c
-      000386 CB 28            [ 8]  719 	sra	b
-      000388 CB 19            [ 8]  720 	rr	c
-      00038A 3E 1C            [ 7]  721 	ld	a, #0x1c
-      00038C 91               [ 4]  722 	sub	a, c
-      00038D DD 77 F9         [19]  723 	ld	-7 (ix), a
-      000390 9F               [ 4]  724 	sbc	a, a
-      000391 90               [ 4]  725 	sub	a, b
-      000392 DD 77 FA         [19]  726 	ld	-6 (ix), a
-      000395 DD 4E FF         [19]  727 	ld	c, -1 (ix)
-      000398 06 00            [ 7]  728 	ld	b, #0x00
-                                    729 ;main.c:141: if (camera.rowoffset == 0)
-      00039A ED 5Br08r00      [20]  730 	ld	de, (#(_camera + 8) + 0)
-                                    731 ;main.c:145: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);
-      00039E 21r06r00         [10]  732 	ld	hl, #(_camera + 6)
-      0003A1 6E               [ 7]  733 	ld	l, (hl)
-                                    734 ;	spillPairReg hl
-      0003A2 DD 7E FD         [19]  735 	ld	a, -3 (ix)
-      0003A5 C6 FE            [ 7]  736 	add	a, #0xfe
-      0003A7 DD 77 FB         [19]  737 	ld	-5 (ix), a
-      0003AA DD 7E FE         [19]  738 	ld	a, -2 (ix)
-      0003AD CE FF            [ 7]  739 	adc	a, #0xff
-      0003AF DD 77 FC         [19]  740 	ld	-4 (ix), a
-                                    741 ;main.c:156: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);
-      0003B2 DD 75 FD         [19]  742 	ld	-3 (ix), l
-      0003B5 DD 36 FE 00      [19]  743 	ld	-2 (ix), #0x00
-                                    744 ;main.c:154: if (y < 28 - (camera.scroll_y / 8)) 
-      0003B9 79               [ 4]  745 	ld	a, c
-      0003BA DD 96 F9         [19]  746 	sub	a, -7 (ix)
-      0003BD 78               [ 4]  747 	ld	a, b
-      0003BE DD 9E FA         [19]  748 	sbc	a, -6 (ix)
-      0003C1 E2rC6r03         [10]  749 	jp	PO, 00218$
-      0003C4 EE 80            [ 7]  750 	xor	a, #0x80
-      0003C6                        751 00218$:
-      0003C6 F2r0Br04         [10]  752 	jp	P, 00107$
-                                    753 ;main.c:156: SMS_loadTileMap(camera.coloffset,camera.rowoffset + y,brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);
-      0003C9 FD 21r00r00      [14]  754 	ld	iy, #_brawl_street_tilemap_bin
-      0003CD C5               [11]  755 	push	bc
-      0003CE DD 4E FB         [19]  756 	ld	c, -5 (ix)
-      0003D1 DD 46 FC         [19]  757 	ld	b, -4 (ix)
-      0003D4 FD 09            [15]  758 	add	iy, bc
-      0003D6 C1               [10]  759 	pop	bc
-      0003D7 2Ar02r00         [16]  760 	ld	hl, (#(_camera + 2) + 0)
-      0003DA 09               [11]  761 	add	hl, bc
-      0003DB D5               [11]  762 	push	de
-      0003DC 5D               [ 4]  763 	ld	e, l
-      0003DD 54               [ 4]  764 	ld	d, h
-      0003DE 29               [11]  765 	add	hl, hl
-      0003DF 19               [11]  766 	add	hl, de
-      0003E0 29               [11]  767 	add	hl, hl
-      0003E1 29               [11]  768 	add	hl, hl
-      0003E2 29               [11]  769 	add	hl, hl
-      0003E3 29               [11]  770 	add	hl, hl
-      0003E4 29               [11]  771 	add	hl, hl
-      0003E5 29               [11]  772 	add	hl, hl
-      0003E6 D1               [10]  773 	pop	de
-      0003E7 C5               [11]  774 	push	bc
-      0003E8 4D               [ 4]  775 	ld	c, l
-      0003E9 44               [ 4]  776 	ld	b, h
-      0003EA FD 09            [15]  777 	add	iy, bc
-      0003EC C1               [10]  778 	pop	bc
-      0003ED EB               [ 4]  779 	ex	de, hl
-      0003EE 09               [11]  780 	add	hl, bc
-      0003EF 29               [11]  781 	add	hl, hl
-      0003F0 29               [11]  782 	add	hl, hl
-      0003F1 29               [11]  783 	add	hl, hl
-      0003F2 29               [11]  784 	add	hl, hl
-      0003F3 29               [11]  785 	add	hl, hl
-      0003F4 DD 5E FD         [19]  786 	ld	e, -3 (ix)
-      0003F7 16 00            [ 7]  787 	ld	d, #0x00
-      0003F9 19               [11]  788 	add	hl, de
-      0003FA 29               [11]  789 	add	hl, hl
-      0003FB 7C               [ 4]  790 	ld	a, h
-      0003FC F6 78            [ 7]  791 	or	a, #0x78
-      0003FE 67               [ 4]  792 	ld	h, a
-                                    793 ;	spillPairReg hl
-                                    794 ;	spillPairReg hl
-      0003FF 11 02 00         [10]  795 	ld	de, #0x0002
-      000402 D5               [11]  796 	push	de
-      000403 FD E5            [15]  797 	push	iy
-      000405 D1               [10]  798 	pop	de
-      000406 CDr00r00         [17]  799 	call	_SMS_VRAMmemcpy
-      000409 18 47            [12]  800 	jr	00123$
-      00040B                        801 00107$:
-                                    802 ;main.c:160: SMS_loadTileMap(camera.coloffset,camera.rowoffset - 28 + y,brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);
-      00040B FD 21r00r00      [14]  803 	ld	iy, #_brawl_street_tilemap_bin
-      00040F C5               [11]  804 	push	bc
-      000410 DD 4E FB         [19]  805 	ld	c, -5 (ix)
-      000413 DD 46 FC         [19]  806 	ld	b, -4 (ix)
-      000416 FD 09            [15]  807 	add	iy, bc
-      000418 C1               [10]  808 	pop	bc
-      000419 2Ar02r00         [16]  809 	ld	hl, (#(_camera + 2) + 0)
-      00041C 09               [11]  810 	add	hl, bc
-      00041D D5               [11]  811 	push	de
-      00041E 5D               [ 4]  812 	ld	e, l
-      00041F 54               [ 4]  813 	ld	d, h
-      000420 29               [11]  814 	add	hl, hl
-      000421 19               [11]  815 	add	hl, de
-      000422 29               [11]  816 	add	hl, hl
-      000423 29               [11]  817 	add	hl, hl
-      000424 29               [11]  818 	add	hl, hl
-      000425 29               [11]  819 	add	hl, hl
-      000426 29               [11]  820 	add	hl, hl
-      000427 29               [11]  821 	add	hl, hl
-      000428 D1               [10]  822 	pop	de
-      000429 C5               [11]  823 	push	bc
-      00042A 4D               [ 4]  824 	ld	c, l
-      00042B 44               [ 4]  825 	ld	b, h
-      00042C FD 09            [15]  826 	add	iy, bc
-      00042E C1               [10]  827 	pop	bc
-      00042F 7B               [ 4]  828 	ld	a, e
-      000430 C6 E4            [ 7]  829 	add	a, #0xe4
-      000432 6F               [ 4]  830 	ld	l, a
-                                    831 ;	spillPairReg hl
-                                    832 ;	spillPairReg hl
-      000433 7A               [ 4]  833 	ld	a, d
-      000434 CE FF            [ 7]  834 	adc	a, #0xff
-      000436 67               [ 4]  835 	ld	h, a
-                                    836 ;	spillPairReg hl
-                                    837 ;	spillPairReg hl
-      000437 09               [11]  838 	add	hl, bc
-      000438 29               [11]  839 	add	hl, hl
-      000439 29               [11]  840 	add	hl, hl
-      00043A 29               [11]  841 	add	hl, hl
-      00043B 29               [11]  842 	add	hl, hl
-      00043C 29               [11]  843 	add	hl, hl
-      00043D DD 5E FD         [19]  844 	ld	e, -3 (ix)
-      000440 16 00            [ 7]  845 	ld	d, #0x00
-      000442 19               [11]  846 	add	hl, de
-      000443 29               [11]  847 	add	hl, hl
-      000444 7C               [ 4]  848 	ld	a, h
-      000445 F6 78            [ 7]  849 	or	a, #0x78
-      000447 67               [ 4]  850 	ld	h, a
-                                    851 ;	spillPairReg hl
-                                    852 ;	spillPairReg hl
-      000448 11 02 00         [10]  853 	ld	de, #0x0002
-      00044B D5               [11]  854 	push	de
-      00044C FD E5            [15]  855 	push	iy
-      00044E D1               [10]  856 	pop	de
-      00044F CDr00r00         [17]  857 	call	_SMS_VRAMmemcpy
-      000452                        858 00123$:
-                                    859 ;main.c:151: for (unsigned char y = 0; y < 28; y++)
-      000452 DD 34 FF         [23]  860 	inc	-1 (ix)
-      000455 C3r64r03         [10]  861 	jp	00122$
-      000458                        862 00114$:
-                                    863 ;main.c:165: camera.view_x-= 2;
-      000458 DD 4E FD         [19]  864 	ld	c, -3 (ix)
-      00045B DD 46 FE         [19]  865 	ld	b, -2 (ix)
-      00045E 0B               [ 6]  866 	dec	bc
-      00045F 0B               [ 6]  867 	dec	bc
-      000460 ED 43r00r00      [20]  868 	ld	(_camera), bc
-      000464                        869 00124$:
-                                    870 ;main.c:168: }
-      000464 DD F9            [10]  871 	ld	sp, ix
-      000466 DD E1            [14]  872 	pop	ix
-      000468 C9               [10]  873 	ret
-                                    874 ;main.c:170: void cam_pan_up(void)
-                                    875 ;	---------------------------------
-                                    876 ; Function cam_pan_up
-                                    877 ; ---------------------------------
-      000469                        878 _cam_pan_up::
-      000469 DD E5            [15]  879 	push	ix
-      00046B DD 21 00 00      [14]  880 	ld	ix,#0
-      00046F DD 39            [15]  881 	add	ix,sp
-      000471 21 F4 FF         [10]  882 	ld	hl, #-12
-      000474 39               [11]  883 	add	hl, sp
-      000475 F9               [ 6]  884 	ld	sp, hl
-                                    885 ;main.c:172: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register.
-      000476 3Ar05r00         [13]  886 	ld	a, (#(_camera + 5) + 0)
-      000479 4F               [ 4]  887 	ld	c, a
-      00047A 06 00            [ 7]  888 	ld	b, #0x00
-      00047C CB 28            [ 8]  889 	sra	b
-      00047E CB 19            [ 8]  890 	rr	c
-      000480 CB 28            [ 8]  891 	sra	b
-      000482 CB 19            [ 8]  892 	rr	c
-      000484 CB 28            [ 8]  893 	sra	b
-      000486 CB 19            [ 8]  894 	rr	c
-      000488 3E 1C            [ 7]  895 	ld	a, #0x1c
-      00048A 91               [ 4]  896 	sub	a, c
-      00048B 4F               [ 4]  897 	ld	c, a
-      00048C 9F               [ 4]  898 	sbc	a, a
-      00048D 90               [ 4]  899 	sub	a, b
-      00048E 47               [ 4]  900 	ld	b, a
-      00048F ED 43r08r00      [20]  901 	ld	((_camera + 8)), bc
-                                    902 ;main.c:174: if (camera.rowoffset == 28) //Tile placement is from 0-27. So when it hits 28 we need to reset the rowoffset.
-      000493 79               [ 4]  903 	ld	a, c
-      000494 D6 1C            [ 7]  904 	sub	a, #0x1c
-      000496 B0               [ 4]  905 	or	a, b
-      000497 20 06            [12]  906 	jr	NZ, 00102$
-                                    907 ;main.c:176: camera.rowoffset = 0;
-      000499 21 00 00         [10]  908 	ld	hl, #0x0000
-      00049C 22r08r00         [16]  909 	ld	((_camera + 8)), hl
-      00049F                        910 00102$:
-                                    911 ;main.c:181: if (camera.scroll_y % 8 == 0 && camera.view_y > 0)
-      00049F 3Ar05r00         [13]  912 	ld	a, (#(_camera + 5) + 0)
-      0004A2 DD 77 FC         [19]  913 	ld	-4 (ix), a
-      0004A5 DD 36 FD 00      [19]  914 	ld	-3 (ix), #0x00
-      0004A9 DD 7E FC         [19]  915 	ld	a, -4 (ix)
-      0004AC E6 07            [ 7]  916 	and	a, #0x07
-      0004AE F6 00            [ 7]  917 	or	a,#0x00
-      0004B0 C2r56r06         [10]  918 	jp	NZ, 00116$
-      0004B3 2Ar02r00         [16]  919 	ld	hl, (#(_camera + 2) + 0)
-      0004B6 AF               [ 4]  920 	xor	a, a
-      0004B7 BD               [ 4]  921 	cp	a, l
-      0004B8 9C               [ 4]  922 	sbc	a, h
-      0004B9 E2rBEr04         [10]  923 	jp	PO, 00232$
-      0004BC EE 80            [ 7]  924 	xor	a, #0x80
-      0004BE                        925 00232$:
-      0004BE F2r56r06         [10]  926 	jp	P, 00116$
-                                    927 ;main.c:186: if (camera.coloffset == 0)
-      0004C1 21r06r00         [10]  928 	ld	hl, #(_camera + 6)
-      0004C4 7E               [ 7]  929 	ld	a, (hl)
-      0004C5 DD 77 FE         [19]  930 	ld	-2 (ix), a
-      0004C8 23               [ 6]  931 	inc	hl
-      0004C9 7E               [ 7]  932 	ld	a, (hl)
-      0004CA DD 77 FF         [19]  933 	ld	-1 (ix), a
-      0004CD DD B6 FE         [19]  934 	or	a, -2 (ix)
-      0004D0 20 59            [12]  935 	jr	NZ, 00113$
-                                    936 ;main.c:188: for (unsigned char x = 0; x < 32; x++)
-      0004D2 0E 00            [ 7]  937 	ld	c, #0x00
-      0004D4                        938 00124$:
-      0004D4 79               [ 4]  939 	ld	a, c
-      0004D5 D6 20            [ 7]  940 	sub	a, #0x20
-      0004D7 D2r4Dr06         [10]  941 	jp	NC, 00114$
-                                    942 ;main.c:190: SMS_loadTileMap(camera.coloffset + x,-camera.rowoffset + 27,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);
-      0004DA ED 5Br00r00      [20]  943 	ld	de, (#_camera + 0)
-      0004DE 69               [ 4]  944 	ld	l, c
-                                    945 ;	spillPairReg hl
-                                    946 ;	spillPairReg hl
-      0004DF AF               [ 4]  947 	xor	a, a
-      0004E0 67               [ 4]  948 	ld	h, a
-      0004E1 29               [11]  949 	add	hl, hl
-      0004E2 19               [11]  950 	add	hl, de
-      0004E3 EB               [ 4]  951 	ex	de, hl
-      0004E4 FD 21r00r00      [14]  952 	ld	iy, #_brawl_street_tilemap_bin
-      0004E8 FD 19            [15]  953 	add	iy, de
-      0004EA 2Ar02r00         [16]  954 	ld	hl, (#(_camera + 2) + 0)
-      0004ED 2B               [ 6]  955 	dec	hl
-      0004EE 5D               [ 4]  956 	ld	e, l
-      0004EF 54               [ 4]  957 	ld	d, h
-      0004F0 29               [11]  958 	add	hl, hl
-      0004F1 19               [11]  959 	add	hl, de
-      0004F2 29               [11]  960 	add	hl, hl
-      0004F3 29               [11]  961 	add	hl, hl
-      0004F4 29               [11]  962 	add	hl, hl
-      0004F5 29               [11]  963 	add	hl, hl
-      0004F6 29               [11]  964 	add	hl, hl
-      0004F7 29               [11]  965 	add	hl, hl
-      0004F8 EB               [ 4]  966 	ex	de, hl
-      0004F9 FD 19            [15]  967 	add	iy, de
-      0004FB 2Ar08r00         [16]  968 	ld	hl, (#(_camera + 8) + 0)
-      0004FE AF               [ 4]  969 	xor	a, a
-      0004FF 95               [ 4]  970 	sub	a, l
-      000500 5F               [ 4]  971 	ld	e, a
-      000501 9F               [ 4]  972 	sbc	a, a
-      000502 94               [ 4]  973 	sub	a, h
-      000503 57               [ 4]  974 	ld	d, a
-      000504 21 1B 00         [10]  975 	ld	hl, #0x001b
-      000507 19               [11]  976 	add	hl, de
-      000508 29               [11]  977 	add	hl, hl
-      000509 29               [11]  978 	add	hl, hl
-      00050A 29               [11]  979 	add	hl, hl
-      00050B 29               [11]  980 	add	hl, hl
-      00050C 29               [11]  981 	add	hl, hl
-      00050D EB               [ 4]  982 	ex	de,hl
-      00050E 3Ar06r00         [13]  983 	ld	a, (#(_camera + 6) + 0)
-      000511 41               [ 4]  984 	ld	b, c
-      000512 80               [ 4]  985 	add	a, b
-      000513 6F               [ 4]  986 	ld	l, a
-                                    987 ;	spillPairReg hl
-                                    988 ;	spillPairReg hl
-      000514 26 00            [ 7]  989 	ld	h, #0x00
-                                    990 ;	spillPairReg hl
-                                    991 ;	spillPairReg hl
-      000516 19               [11]  992 	add	hl, de
-      000517 29               [11]  993 	add	hl, hl
-      000518 7C               [ 4]  994 	ld	a, h
-      000519 F6 78            [ 7]  995 	or	a, #0x78
-      00051B 67               [ 4]  996 	ld	h, a
-                                    997 ;	spillPairReg hl
-                                    998 ;	spillPairReg hl
-      00051C C5               [11]  999 	push	bc
-      00051D 11 02 00         [10] 1000 	ld	de, #0x0002
-      000520 D5               [11] 1001 	push	de
-      000521 FD E5            [15] 1002 	push	iy
-      000523 D1               [10] 1003 	pop	de
-      000524 CDr00r00         [17] 1004 	call	_SMS_VRAMmemcpy
-      000527 C1               [10] 1005 	pop	bc
-                                   1006 ;main.c:188: for (unsigned char x = 0; x < 32; x++)
-      000528 0C               [ 4] 1007 	inc	c
-      000529 18 A9            [12] 1008 	jr	00124$
-      00052B                       1009 00113$:
-                                   1010 ;main.c:193: else if (camera.coloffset != 0)
-      00052B DD 7E FF         [19] 1011 	ld	a, -1 (ix)
-      00052E DD B6 FE         [19] 1012 	or	a, -2 (ix)
-      000531 CAr4Dr06         [10] 1013 	jp	Z, 00114$
-                                   1014 ;main.c:195: camera.rowoffset = (camera.scroll_y / 8); //(camera.scroll_y / 8) - 1
-      000534 DD 4E FC         [19] 1015 	ld	c, -4 (ix)
-      000537 06 00            [ 7] 1016 	ld	b, #0x00
-      000539 CB 28            [ 8] 1017 	sra	b
-      00053B CB 19            [ 8] 1018 	rr	c
-      00053D CB 28            [ 8] 1019 	sra	b
-      00053F CB 19            [ 8] 1020 	rr	c
-      000541 CB 28            [ 8] 1021 	sra	b
-      000543 CB 19            [ 8] 1022 	rr	c
-      000545 ED 43r08r00      [20] 1023 	ld	((_camera + 8)), bc
-                                   1024 ;main.c:196: if (camera.rowoffset == 0)
-      000549 2Ar08r00         [16] 1025 	ld	hl, (#(_camera + 8) + 0)
-      00054C 7C               [ 4] 1026 	ld	a, h
-      00054D B5               [ 4] 1027 	or	a, l
-      00054E 20 06            [12] 1028 	jr	NZ, 00145$
-                                   1029 ;main.c:198: camera.rowoffset = 28;
-      000550 21 1C 00         [10] 1030 	ld	hl, #0x001c
-      000553 22r08r00         [16] 1031 	ld	((_camera + 8)), hl
-                                   1032 ;main.c:200: for (unsigned char x = 0; x < 32; x++)
-      000556                       1033 00145$:
-      000556 DD 36 FF 00      [19] 1034 	ld	-1 (ix), #0x00
-      00055A                       1035 00127$:
-      00055A DD 7E FF         [19] 1036 	ld	a, -1 (ix)
-      00055D D6 20            [ 7] 1037 	sub	a, #0x20
-      00055F D2r4Dr06         [10] 1038 	jp	NC, 00114$
-                                   1039 ;main.c:202: if (x < 32 - camera.coloffset)
-      000562 ED 4Br06r00      [20] 1040 	ld	bc, (#(_camera + 6) + 0)
-      000566 3E 20            [ 7] 1041 	ld	a, #0x20
-      000568 91               [ 4] 1042 	sub	a, c
-      000569 DD 77 F4         [19] 1043 	ld	-12 (ix), a
-      00056C 9F               [ 4] 1044 	sbc	a, a
-      00056D 90               [ 4] 1045 	sub	a, b
-      00056E DD 77 F5         [19] 1046 	ld	-11 (ix), a
-      000571 DD 7E FF         [19] 1047 	ld	a, -1 (ix)
-      000574 DD 77 F6         [19] 1048 	ld	-10 (ix), a
-      000577 DD 36 F7 00      [19] 1049 	ld	-9 (ix), #0x00
-                                   1050 ;main.c:190: SMS_loadTileMap(camera.coloffset + x,-camera.rowoffset + 27,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);
-      00057B 21r00r00         [10] 1051 	ld	hl, #_camera
-      00057E 7E               [ 7] 1052 	ld	a, (hl)
-      00057F DD 77 F8         [19] 1053 	ld	-8 (ix), a
-      000582 23               [ 6] 1054 	inc	hl
-      000583 7E               [ 7] 1055 	ld	a, (hl)
-      000584 DD 77 F9         [19] 1056 	ld	-7 (ix), a
-      000587 ED 5Br02r00      [20] 1057 	ld	de, (#(_camera + 2) + 0)
-      00058B 21r08r00         [10] 1058 	ld	hl, #(_camera + 8)
-      00058E 7E               [ 7] 1059 	ld	a, (hl)
-      00058F DD 77 FD         [19] 1060 	ld	-3 (ix), a
-      000592 23               [ 6] 1061 	inc	hl
-      000593 7E               [ 7] 1062 	ld	a, (hl)
-      000594 DD 77 FE         [19] 1063 	ld	-2 (ix), a
-                                   1064 ;main.c:204: SMS_loadTileMap(camera.coloffset + x,camera.rowoffset - 1,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);
-      000597 DD 6E F6         [19] 1065 	ld	l, -10 (ix)
-      00059A DD 66 F7         [19] 1066 	ld	h, -9 (ix)
-      00059D 29               [11] 1067 	add	hl, hl
-      00059E DD 7E FF         [19] 1068 	ld	a, -1 (ix)
-      0005A1 DD 77 FA         [19] 1069 	ld	-6 (ix), a
-      0005A4 1B               [ 6] 1070 	dec	de
-      0005A5 DD 7E FD         [19] 1071 	ld	a, -3 (ix)
-      0005A8 C6 FF            [ 7] 1072 	add	a, #0xff
-      0005AA DD 77 FB         [19] 1073 	ld	-5 (ix), a
-      0005AD DD 7E FE         [19] 1074 	ld	a, -2 (ix)
-      0005B0 CE FF            [ 7] 1075 	adc	a, #0xff
-      0005B2 DD 77 FC         [19] 1076 	ld	-4 (ix), a
-      0005B5 DD 7E F8         [19] 1077 	ld	a, -8 (ix)
-      0005B8 85               [ 4] 1078 	add	a, l
-      0005B9 DD 77 FD         [19] 1079 	ld	-3 (ix), a
-      0005BC DD 7E F9         [19] 1080 	ld	a, -7 (ix)
-      0005BF 8C               [ 4] 1081 	adc	a, h
-      0005C0 DD 77 FE         [19] 1082 	ld	-2 (ix), a
-      0005C3 6B               [ 4] 1083 	ld	l, e
-      0005C4 62               [ 4] 1084 	ld	h, d
-      0005C5 29               [11] 1085 	add	hl, hl
-      0005C6 19               [11] 1086 	add	hl, de
-      0005C7 29               [11] 1087 	add	hl, hl
-      0005C8 29               [11] 1088 	add	hl, hl
-      0005C9 29               [11] 1089 	add	hl, hl
-      0005CA 29               [11] 1090 	add	hl, hl
-      0005CB 29               [11] 1091 	add	hl, hl
-      0005CC 29               [11] 1092 	add	hl, hl
-      0005CD EB               [ 4] 1093 	ex	de, hl
-      0005CE DD 6E FB         [19] 1094 	ld	l, -5 (ix)
-                                   1095 ;	spillPairReg hl
-                                   1096 ;	spillPairReg hl
-      0005D1 DD 66 FC         [19] 1097 	ld	h, -4 (ix)
-                                   1098 ;	spillPairReg hl
-                                   1099 ;	spillPairReg hl
-      0005D4 29               [11] 1100 	add	hl, hl
-      0005D5 29               [11] 1101 	add	hl, hl
-      0005D6 29               [11] 1102 	add	hl, hl
-      0005D7 29               [11] 1103 	add	hl, hl
-      0005D8 29               [11] 1104 	add	hl, hl
-      0005D9 DD 75 FB         [19] 1105 	ld	-5 (ix), l
-      0005DC DD 74 FC         [19] 1106 	ld	-4 (ix), h
-                                   1107 ;main.c:202: if (x < 32 - camera.coloffset)
-      0005DF DD 7E F6         [19] 1108 	ld	a, -10 (ix)
-      0005E2 DD 96 F4         [19] 1109 	sub	a, -12 (ix)
-      0005E5 DD 7E F7         [19] 1110 	ld	a, -9 (ix)
-      0005E8 DD 9E F5         [19] 1111 	sbc	a, -11 (ix)
-      0005EB E2rF0r05         [10] 1112 	jp	PO, 00233$
-      0005EE EE 80            [ 7] 1113 	xor	a, #0x80
-      0005F0                       1114 00233$:
-      0005F0 F2r1Dr06         [10] 1115 	jp	P, 00107$
-                                   1116 ;main.c:204: SMS_loadTileMap(camera.coloffset + x,camera.rowoffset - 1,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);
-      0005F3 3Er00            [ 7] 1117 	ld	a, #<(_brawl_street_tilemap_bin)
-      0005F5 DD 86 FD         [19] 1118 	add	a, -3 (ix)
-      0005F8 6F               [ 4] 1119 	ld	l, a
-                                   1120 ;	spillPairReg hl
-                                   1121 ;	spillPairReg hl
-      0005F9 3Es00            [ 7] 1122 	ld	a, #>(_brawl_street_tilemap_bin)
-      0005FB DD 8E FE         [19] 1123 	adc	a, -2 (ix)
-      0005FE 67               [ 4] 1124 	ld	h, a
-                                   1125 ;	spillPairReg hl
-                                   1126 ;	spillPairReg hl
-      0005FF 19               [11] 1127 	add	hl, de
-      000600 EB               [ 4] 1128 	ex	de, hl
-      000601 79               [ 4] 1129 	ld	a, c
-      000602 DD 86 FA         [19] 1130 	add	a, -6 (ix)
-      000605 4F               [ 4] 1131 	ld	c, a
-      000606 06 00            [ 7] 1132 	ld	b, #0x00
-      000608 DD 6E FB         [19] 1133 	ld	l, -5 (ix)
-                                   1134 ;	spillPairReg hl
-                                   1135 ;	spillPairReg hl
-      00060B DD 66 FC         [19] 1136 	ld	h, -4 (ix)
-                                   1137 ;	spillPairReg hl
-                                   1138 ;	spillPairReg hl
-      00060E 09               [11] 1139 	add	hl, bc
-      00060F 29               [11] 1140 	add	hl, hl
-      000610 7C               [ 4] 1141 	ld	a, h
-      000611 F6 78            [ 7] 1142 	or	a, #0x78
-      000613 67               [ 4] 1143 	ld	h, a
-                                   1144 ;	spillPairReg hl
-                                   1145 ;	spillPairReg hl
-      000614 01 02 00         [10] 1146 	ld	bc, #0x0002
-      000617 C5               [11] 1147 	push	bc
-      000618 CDr00r00         [17] 1148 	call	_SMS_VRAMmemcpy
-      00061B 18 2A            [12] 1149 	jr	00128$
-      00061D                       1150 00107$:
-                                   1151 ;main.c:208: SMS_loadTileMap(camera.coloffset - 32 + x,camera.rowoffset - 1,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);
-      00061D 3Er00            [ 7] 1152 	ld	a, #<(_brawl_street_tilemap_bin)
-      00061F DD 86 FD         [19] 1153 	add	a, -3 (ix)
-      000622 6F               [ 4] 1154 	ld	l, a
-                                   1155 ;	spillPairReg hl
-                                   1156 ;	spillPairReg hl
-      000623 3Es00            [ 7] 1157 	ld	a, #>(_brawl_street_tilemap_bin)
-      000625 DD 8E FE         [19] 1158 	adc	a, -2 (ix)
-      000628 67               [ 4] 1159 	ld	h, a
-                                   1160 ;	spillPairReg hl
-                                   1161 ;	spillPairReg hl
-      000629 19               [11] 1162 	add	hl, de
-      00062A EB               [ 4] 1163 	ex	de, hl
-      00062B 79               [ 4] 1164 	ld	a, c
-      00062C C6 E0            [ 7] 1165 	add	a, #0xe0
-      00062E DD 86 FA         [19] 1166 	add	a, -6 (ix)
-      000631 4F               [ 4] 1167 	ld	c, a
-      000632 06 00            [ 7] 1168 	ld	b, #0x00
-      000634 DD 6E FB         [19] 1169 	ld	l, -5 (ix)
-                                   1170 ;	spillPairReg hl
-                                   1171 ;	spillPairReg hl
-      000637 DD 66 FC         [19] 1172 	ld	h, -4 (ix)
-                                   1173 ;	spillPairReg hl
-                                   1174 ;	spillPairReg hl
-      00063A 09               [11] 1175 	add	hl, bc
-      00063B 29               [11] 1176 	add	hl, hl
-      00063C 7C               [ 4] 1177 	ld	a, h
-      00063D F6 78            [ 7] 1178 	or	a, #0x78
-      00063F 67               [ 4] 1179 	ld	h, a
-                                   1180 ;	spillPairReg hl
-                                   1181 ;	spillPairReg hl
-      000640 01 02 00         [10] 1182 	ld	bc, #0x0002
-      000643 C5               [11] 1183 	push	bc
-      000644 CDr00r00         [17] 1184 	call	_SMS_VRAMmemcpy
-      000647                       1185 00128$:
-                                   1186 ;main.c:200: for (unsigned char x = 0; x < 32; x++)
-      000647 DD 34 FF         [23] 1187 	inc	-1 (ix)
-      00064A C3r5Ar05         [10] 1188 	jp	00127$
-      00064D                       1189 00114$:
-                                   1190 ;main.c:214: camera.view_y--;
-      00064D ED 4Br02r00      [20] 1191 	ld	bc, (#(_camera + 2) + 0)
-      000651 0B               [ 6] 1192 	dec	bc
-      000652 ED 43r02r00      [20] 1193 	ld	((_camera + 2)), bc
-      000656                       1194 00116$:
-                                   1195 ;main.c:217: if (camera.view_y > 0 || camera.scroll_y % 32 != 0)
-      000656 ED 4Br02r00      [20] 1196 	ld	bc, (#(_camera + 2) + 0)
-                                   1197 ;main.c:172: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register.
-      00065A 21r05r00         [10] 1198 	ld	hl, #(_camera + 5)
-      00065D 5E               [ 7] 1199 	ld	e, (hl)
-                                   1200 ;main.c:217: if (camera.view_y > 0 || camera.scroll_y % 32 != 0)
-      00065E AF               [ 4] 1201 	xor	a, a
-      00065F B9               [ 4] 1202 	cp	a, c
-      000660 98               [ 4] 1203 	sbc	a, b
-      000661 E2r66r06         [10] 1204 	jp	PO, 00234$
-      000664 EE 80            [ 7] 1205 	xor	a, #0x80
-      000666                       1206 00234$:
-      000666 FAr6Er06         [10] 1207 	jp	M, 00120$
-      000669 7B               [ 4] 1208 	ld	a, e
-      00066A E6 1F            [ 7] 1209 	and	a, #0x1f
-      00066C 28 0C            [12] 1210 	jr	Z, 00129$
-      00066E                       1211 00120$:
-                                   1212 ;main.c:220: camera.scroll_y--;
-      00066E 1D               [ 4] 1213 	dec	e
-      00066F 21r05r00         [10] 1214 	ld	hl, #(_camera + 5)
-      000672 73               [ 7] 1215 	ld	(hl), e
-                                   1216 ;main.c:221: if (camera.scroll_y > 223)
-      000673 3E DF            [ 7] 1217 	ld	a, #0xdf
-      000675 93               [ 4] 1218 	sub	a, e
-      000676 30 02            [12] 1219 	jr	NC, 00129$
-                                   1220 ;main.c:223: camera.scroll_y = 223;
-      000678 36 DF            [10] 1221 	ld	(hl), #0xdf
-      00067A                       1222 00129$:
-                                   1223 ;main.c:228: }
-      00067A DD F9            [10] 1224 	ld	sp, ix
-      00067C DD E1            [14] 1225 	pop	ix
-      00067E C9               [10] 1226 	ret
-                                   1227 ;main.c:230: void cam_pan_down(void)
-                                   1228 ;	---------------------------------
-                                   1229 ; Function cam_pan_down
-                                   1230 ; ---------------------------------
-      00067F                       1231 _cam_pan_down::
-      00067F DD E5            [15] 1232 	push	ix
-      000681 DD 21 00 00      [14] 1233 	ld	ix,#0
-      000685 DD 39            [15] 1234 	add	ix,sp
-      000687 21 F5 FF         [10] 1235 	ld	hl, #-11
-      00068A 39               [11] 1236 	add	hl, sp
-      00068B F9               [ 6] 1237 	ld	sp, hl
-                                   1238 ;main.c:233: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register in tiles.
-      00068C 01r05r00         [10] 1239 	ld	bc, #_camera + 5
-      00068F 0A               [ 7] 1240 	ld	a, (bc)
-      000690 5F               [ 4] 1241 	ld	e, a
-      000691 16 00            [ 7] 1242 	ld	d, #0x00
-      000693 CB 2A            [ 8] 1243 	sra	d
-      000695 CB 1B            [ 8] 1244 	rr	e
-      000697 CB 2A            [ 8] 1245 	sra	d
-      000699 CB 1B            [ 8] 1246 	rr	e
-      00069B CB 2A            [ 8] 1247 	sra	d
-      00069D CB 1B            [ 8] 1248 	rr	e
-      00069F 21 1C 00         [10] 1249 	ld	hl, #0x001c
-      0006A2 BF               [ 4] 1250 	cp	a, a
-      0006A3 ED 52            [15] 1251 	sbc	hl, de
-      0006A5 EB               [ 4] 1252 	ex	de, hl
-      0006A6 ED 53r08r00      [20] 1253 	ld	((_camera + 8)), de
-                                   1254 ;main.c:236: if (camera.view_y < 24)
-      0006AA 2Ar02r00         [16] 1255 	ld	hl, (#(_camera + 2) + 0)
-      0006AD 11 18 80         [10] 1256 	ld	de, #0x8018
-      0006B0 29               [11] 1257 	add	hl, hl
-      0006B1 3F               [ 4] 1258 	ccf
-      0006B2 CB 1C            [ 8] 1259 	rr	h
-      0006B4 CB 1D            [ 8] 1260 	rr	l
-      0006B6 ED 52            [15] 1261 	sbc	hl, de
-      0006B8 30 03            [12] 1262 	jr	NC, 00102$
-                                   1263 ;main.c:238: camera.scroll_y++;
-      0006BA 0A               [ 7] 1264 	ld	a, (bc)
-      0006BB 3C               [ 4] 1265 	inc	a
-      0006BC 02               [ 7] 1266 	ld	(bc), a
-      0006BD                       1267 00102$:
-                                   1268 ;main.c:241: if (camera.scroll_y > 223)
-      0006BD 0A               [ 7] 1269 	ld	a, (bc)
-      0006BE 5F               [ 4] 1270 	ld	e, a
-      0006BF 3E DF            [ 7] 1271 	ld	a, #0xdf
-      0006C1 93               [ 4] 1272 	sub	a, e
-      0006C2 30 02            [12] 1273 	jr	NC, 00104$
-                                   1274 ;main.c:243: camera.scroll_y = 0;
-      0006C4 AF               [ 4] 1275 	xor	a, a
-      0006C5 02               [ 7] 1276 	ld	(bc), a
-      0006C6                       1277 00104$:
-                                   1278 ;main.c:233: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register in tiles.
-      0006C6 0A               [ 7] 1279 	ld	a, (bc)
-                                   1280 ;main.c:245: if (camera.scroll_y % 8 == 0 && camera.view_y < 24)
-      0006C7 DD 77 F9         [19] 1281 	ld	-7 (ix), a
-      0006CA DD 36 FA 00      [19] 1282 	ld	-6 (ix), #0x00
-      0006CE DD 7E F9         [19] 1283 	ld	a, -7 (ix)
-      0006D1 E6 07            [ 7] 1284 	and	a, #0x07
-      0006D3 C2r92r08         [10] 1285 	jp	NZ,00117$
-                                   1286 ;main.c:236: if (camera.view_y < 24)
-      0006D6 21r02r00         [10] 1287 	ld	hl, #(_camera + 2)
-      0006D9 7E               [ 7] 1288 	ld	a, (hl)
-      0006DA DD 77 FD         [19] 1289 	ld	-3 (ix), a
-      0006DD 23               [ 6] 1290 	inc	hl
-      0006DE 7E               [ 7] 1291 	ld	a, (hl)
-      0006DF DD 77 FE         [19] 1292 	ld	-2 (ix), a
-                                   1293 ;main.c:245: if (camera.scroll_y % 8 == 0 && camera.view_y < 24)
-      0006E2 DD 7E FD         [19] 1294 	ld	a, -3 (ix)
-      0006E5 D6 18            [ 7] 1295 	sub	a, #0x18
-      0006E7 DD 7E FE         [19] 1296 	ld	a, -2 (ix)
-      0006EA 17               [ 4] 1297 	rla
-      0006EB 3F               [ 4] 1298 	ccf
-      0006EC 1F               [ 4] 1299 	rra
-      0006ED DE 80            [ 7] 1300 	sbc	a, #0x80
-      0006EF D2r92r08         [10] 1301 	jp	NC, 00117$
-                                   1302 ;main.c:248: if (camera.coloffset == 0)
-      0006F2 21r06r00         [10] 1303 	ld	hl, #(_camera + 6)
-      0006F5 7E               [ 7] 1304 	ld	a, (hl)
-      0006F6 DD 77 FB         [19] 1305 	ld	-5 (ix), a
-      0006F9 23               [ 6] 1306 	inc	hl
-      0006FA 7E               [ 7] 1307 	ld	a, (hl)
-      0006FB DD 77 FC         [19] 1308 	ld	-4 (ix), a
-      0006FE DD B6 FB         [19] 1309 	or	a, -5 (ix)
-      000701 20 6B            [12] 1310 	jr	NZ, 00114$
-                                   1311 ;main.c:250: for (unsigned char x = 0; x < 32; x ++)
-      000703 0E 00            [ 7] 1312 	ld	c, #0x00
-      000705                       1313 00122$:
-                                   1314 ;main.c:236: if (camera.view_y < 24)
-      000705 21r02r00         [10] 1315 	ld	hl, #(_camera + 2)
-      000708 7E               [ 7] 1316 	ld	a, (hl)
-      000709 DD 77 FD         [19] 1317 	ld	-3 (ix), a
-      00070C 23               [ 6] 1318 	inc	hl
-      00070D 7E               [ 7] 1319 	ld	a, (hl)
-      00070E DD 77 FE         [19] 1320 	ld	-2 (ix), a
-                                   1321 ;main.c:250: for (unsigned char x = 0; x < 32; x ++)
-      000711 79               [ 4] 1322 	ld	a, c
-      000712 D6 20            [ 7] 1323 	sub	a, #0x20
-      000714 D2r87r08         [10] 1324 	jp	NC, 00115$
-                                   1325 ;main.c:252: SMS_loadTileMap(camera.coloffset + x,-camera.rowoffset + 28,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-      000717 ED 5Br00r00      [20] 1326 	ld	de, (#_camera + 0)
-      00071B 69               [ 4] 1327 	ld	l, c
-                                   1328 ;	spillPairReg hl
-                                   1329 ;	spillPairReg hl
-      00071C AF               [ 4] 1330 	xor	a, a
-      00071D 67               [ 4] 1331 	ld	h, a
-      00071E 29               [11] 1332 	add	hl, hl
-      00071F 19               [11] 1333 	add	hl, de
-      000720 EB               [ 4] 1334 	ex	de, hl
-      000721 FD 21r00r00      [14] 1335 	ld	iy, #_brawl_street_tilemap_bin
-      000725 FD 19            [15] 1336 	add	iy, de
-      000727 DD 6E FD         [19] 1337 	ld	l, -3 (ix)
-                                   1338 ;	spillPairReg hl
-                                   1339 ;	spillPairReg hl
-      00072A DD 66 FE         [19] 1340 	ld	h, -2 (ix)
-                                   1341 ;	spillPairReg hl
-                                   1342 ;	spillPairReg hl
-      00072D 11 1C 00         [10] 1343 	ld	de, #0x001c
-      000730 19               [11] 1344 	add	hl, de
-      000731 5D               [ 4] 1345 	ld	e, l
-      000732 54               [ 4] 1346 	ld	d, h
-      000733 29               [11] 1347 	add	hl, hl
-      000734 19               [11] 1348 	add	hl, de
-      000735 29               [11] 1349 	add	hl, hl
-      000736 29               [11] 1350 	add	hl, hl
-      000737 29               [11] 1351 	add	hl, hl
-      000738 29               [11] 1352 	add	hl, hl
-      000739 29               [11] 1353 	add	hl, hl
-      00073A 29               [11] 1354 	add	hl, hl
-      00073B EB               [ 4] 1355 	ex	de, hl
-      00073C FD 19            [15] 1356 	add	iy, de
-      00073E 2Ar08r00         [16] 1357 	ld	hl, (#(_camera + 8) + 0)
-      000741 AF               [ 4] 1358 	xor	a, a
-      000742 95               [ 4] 1359 	sub	a, l
-      000743 5F               [ 4] 1360 	ld	e, a
-      000744 9F               [ 4] 1361 	sbc	a, a
-      000745 94               [ 4] 1362 	sub	a, h
-      000746 57               [ 4] 1363 	ld	d, a
-      000747 21 1C 00         [10] 1364 	ld	hl, #0x001c
-      00074A 19               [11] 1365 	add	hl, de
-      00074B 29               [11] 1366 	add	hl, hl
-      00074C 29               [11] 1367 	add	hl, hl
-      00074D 29               [11] 1368 	add	hl, hl
-      00074E 29               [11] 1369 	add	hl, hl
-      00074F 29               [11] 1370 	add	hl, hl
-      000750 EB               [ 4] 1371 	ex	de,hl
-      000751 3Ar06r00         [13] 1372 	ld	a, (#(_camera + 6) + 0)
-      000754 41               [ 4] 1373 	ld	b, c
-      000755 80               [ 4] 1374 	add	a, b
-      000756 6F               [ 4] 1375 	ld	l, a
-                                   1376 ;	spillPairReg hl
-                                   1377 ;	spillPairReg hl
-      000757 26 00            [ 7] 1378 	ld	h, #0x00
-                                   1379 ;	spillPairReg hl
-                                   1380 ;	spillPairReg hl
-      000759 19               [11] 1381 	add	hl, de
-      00075A 29               [11] 1382 	add	hl, hl
-      00075B 7C               [ 4] 1383 	ld	a, h
-      00075C F6 78            [ 7] 1384 	or	a, #0x78
-      00075E 67               [ 4] 1385 	ld	h, a
-                                   1386 ;	spillPairReg hl
-                                   1387 ;	spillPairReg hl
-      00075F C5               [11] 1388 	push	bc
-      000760 11 02 00         [10] 1389 	ld	de, #0x0002
-      000763 D5               [11] 1390 	push	de
-      000764 FD E5            [15] 1391 	push	iy
-      000766 D1               [10] 1392 	pop	de
-      000767 CDr00r00         [17] 1393 	call	_SMS_VRAMmemcpy
-      00076A C1               [10] 1394 	pop	bc
-                                   1395 ;main.c:250: for (unsigned char x = 0; x < 32; x ++)
-      00076B 0C               [ 4] 1396 	inc	c
-      00076C 18 97            [12] 1397 	jr	00122$
-      00076E                       1398 00114$:
-                                   1399 ;main.c:255: else if (camera.coloffset != 0 && camera.view_y < 23)
-      00076E DD 7E FC         [19] 1400 	ld	a, -4 (ix)
-      000771 DD B6 FB         [19] 1401 	or	a, -5 (ix)
-      000774 CAr87r08         [10] 1402 	jp	Z, 00115$
-      000777 DD 7E FD         [19] 1403 	ld	a, -3 (ix)
-      00077A D6 17            [ 7] 1404 	sub	a, #0x17
-      00077C DD 7E FE         [19] 1405 	ld	a, -2 (ix)
-      00077F 17               [ 4] 1406 	rla
-      000780 3F               [ 4] 1407 	ccf
-      000781 1F               [ 4] 1408 	rra
-      000782 DE 80            [ 7] 1409 	sbc	a, #0x80
-      000784 D2r87r08         [10] 1410 	jp	NC, 00115$
-                                   1411 ;main.c:257: camera.rowoffset = (camera.scroll_y / 8) - 1;
-      000787 DD 4E F9         [19] 1412 	ld	c, -7 (ix)
-      00078A 06 00            [ 7] 1413 	ld	b, #0x00
-      00078C CB 28            [ 8] 1414 	sra	b
-      00078E CB 19            [ 8] 1415 	rr	c
-      000790 CB 28            [ 8] 1416 	sra	b
-      000792 CB 19            [ 8] 1417 	rr	c
-      000794 CB 28            [ 8] 1418 	sra	b
-      000796 CB 19            [ 8] 1419 	rr	c
-      000798 0B               [ 6] 1420 	dec	bc
-      000799 ED 43r08r00      [20] 1421 	ld	((_camera + 8)), bc
-                                   1422 ;main.c:258: for (unsigned char x = 0; x < 32; x++)
-      00079D DD 36 FF 00      [19] 1423 	ld	-1 (ix), #0x00
-      0007A1                       1424 00125$:
-                                   1425 ;main.c:236: if (camera.view_y < 24)
-      0007A1 21r02r00         [10] 1426 	ld	hl, #(_camera + 2)
-      0007A4 7E               [ 7] 1427 	ld	a, (hl)
-      0007A5 DD 77 FD         [19] 1428 	ld	-3 (ix), a
-      0007A8 23               [ 6] 1429 	inc	hl
-      0007A9 7E               [ 7] 1430 	ld	a, (hl)
-      0007AA DD 77 FE         [19] 1431 	ld	-2 (ix), a
-                                   1432 ;main.c:258: for (unsigned char x = 0; x < 32; x++)
-      0007AD DD 7E FF         [19] 1433 	ld	a, -1 (ix)
-      0007B0 D6 20            [ 7] 1434 	sub	a, #0x20
-      0007B2 D2r87r08         [10] 1435 	jp	NC, 00115$
-                                   1436 ;main.c:260: if (x < 32 - camera.coloffset)
-      0007B5 ED 4Br06r00      [20] 1437 	ld	bc, (#(_camera + 6) + 0)
-      0007B9 3E 20            [ 7] 1438 	ld	a, #0x20
-      0007BB 91               [ 4] 1439 	sub	a, c
-      0007BC DD 77 F5         [19] 1440 	ld	-11 (ix), a
-      0007BF 9F               [ 4] 1441 	sbc	a, a
-      0007C0 90               [ 4] 1442 	sub	a, b
-      0007C1 DD 77 F6         [19] 1443 	ld	-10 (ix), a
-      0007C4 DD 7E FF         [19] 1444 	ld	a, -1 (ix)
-      0007C7 DD 77 F7         [19] 1445 	ld	-9 (ix), a
-      0007CA DD 36 F8 00      [19] 1446 	ld	-8 (ix), #0x00
-                                   1447 ;main.c:252: SMS_loadTileMap(camera.coloffset + x,-camera.rowoffset + 28,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-      0007CE 21r00r00         [10] 1448 	ld	hl, #_camera
-      0007D1 7E               [ 7] 1449 	ld	a, (hl)
-      0007D2 DD 77 F9         [19] 1450 	ld	-7 (ix), a
-      0007D5 23               [ 6] 1451 	inc	hl
-      0007D6 7E               [ 7] 1452 	ld	a, (hl)
-      0007D7 DD 77 FA         [19] 1453 	ld	-6 (ix), a
-      0007DA ED 5Br08r00      [20] 1454 	ld	de, (#(_camera + 8) + 0)
-                                   1455 ;main.c:262: SMS_loadTileMap(camera.coloffset + x,camera.rowoffset,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-      0007DE DD 6E F7         [19] 1456 	ld	l, -9 (ix)
-      0007E1 DD 66 F8         [19] 1457 	ld	h, -8 (ix)
-      0007E4 29               [11] 1458 	add	hl, hl
-      0007E5 DD 71 FB         [19] 1459 	ld	-5 (ix), c
-      0007E8 DD 7E FF         [19] 1460 	ld	a, -1 (ix)
-      0007EB DD 77 FC         [19] 1461 	ld	-4 (ix), a
-                                   1462 ;main.c:252: SMS_loadTileMap(camera.coloffset + x,-camera.rowoffset + 28,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-      0007EE DD 7E FD         [19] 1463 	ld	a, -3 (ix)
-      0007F1 C6 1C            [ 7] 1464 	add	a, #0x1c
-      0007F3 4F               [ 4] 1465 	ld	c, a
-      0007F4 DD 7E FE         [19] 1466 	ld	a, -2 (ix)
-      0007F7 CE 00            [ 7] 1467 	adc	a, #0x00
-      0007F9 47               [ 4] 1468 	ld	b, a
-                                   1469 ;main.c:262: SMS_loadTileMap(camera.coloffset + x,camera.rowoffset,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-      0007FA DD 7E F9         [19] 1470 	ld	a, -7 (ix)
-      0007FD 85               [ 4] 1471 	add	a, l
-      0007FE DD 77 FD         [19] 1472 	ld	-3 (ix), a
-      000801 DD 7E FA         [19] 1473 	ld	a, -6 (ix)
-      000804 8C               [ 4] 1474 	adc	a, h
-      000805 DD 77 FE         [19] 1475 	ld	-2 (ix), a
-      000808 69               [ 4] 1476 	ld	l, c
-      000809 60               [ 4] 1477 	ld	h, b
-      00080A 29               [11] 1478 	add	hl, hl
-      00080B 09               [11] 1479 	add	hl, bc
-      00080C 29               [11] 1480 	add	hl, hl
-      00080D 29               [11] 1481 	add	hl, hl
-      00080E 29               [11] 1482 	add	hl, hl
-      00080F 29               [11] 1483 	add	hl, hl
-      000810 29               [11] 1484 	add	hl, hl
-      000811 29               [11] 1485 	add	hl, hl
-      000812 4D               [ 4] 1486 	ld	c, l
-      000813 44               [ 4] 1487 	ld	b, h
-      000814 EB               [ 4] 1488 	ex	de, hl
-      000815 29               [11] 1489 	add	hl, hl
-      000816 29               [11] 1490 	add	hl, hl
-      000817 29               [11] 1491 	add	hl, hl
-      000818 29               [11] 1492 	add	hl, hl
-      000819 29               [11] 1493 	add	hl, hl
-      00081A EB               [ 4] 1494 	ex	de, hl
-                                   1495 ;main.c:260: if (x < 32 - camera.coloffset)
-      00081B DD 7E F7         [19] 1496 	ld	a, -9 (ix)
-      00081E DD 96 F5         [19] 1497 	sub	a, -11 (ix)
-      000821 DD 7E F8         [19] 1498 	ld	a, -8 (ix)
-      000824 DD 9E F6         [19] 1499 	sbc	a, -10 (ix)
-      000827 E2r2Cr08         [10] 1500 	jp	PO, 00230$
-      00082A EE 80            [ 7] 1501 	xor	a, #0x80
-      00082C                       1502 00230$:
-      00082C F2r58r08         [10] 1503 	jp	P, 00107$
-                                   1504 ;main.c:262: SMS_loadTileMap(camera.coloffset + x,camera.rowoffset,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-      00082F 3Er00            [ 7] 1505 	ld	a, #<(_brawl_street_tilemap_bin)
-      000831 DD 86 FD         [19] 1506 	add	a, -3 (ix)
-      000834 6F               [ 4] 1507 	ld	l, a
-                                   1508 ;	spillPairReg hl
-                                   1509 ;	spillPairReg hl
-      000835 3Es00            [ 7] 1510 	ld	a, #>(_brawl_street_tilemap_bin)
-      000837 DD 8E FE         [19] 1511 	adc	a, -2 (ix)
-      00083A 67               [ 4] 1512 	ld	h, a
-                                   1513 ;	spillPairReg hl
-                                   1514 ;	spillPairReg hl
-      00083B 09               [11] 1515 	add	hl, bc
-      00083C 4D               [ 4] 1516 	ld	c, l
-      00083D 44               [ 4] 1517 	ld	b, h
-      00083E DD 7E FB         [19] 1518 	ld	a, -5 (ix)
-      000841 DD 86 FC         [19] 1519 	add	a, -4 (ix)
-      000844 6F               [ 4] 1520 	ld	l, a
-                                   1521 ;	spillPairReg hl
-                                   1522 ;	spillPairReg hl
-      000845 26 00            [ 7] 1523 	ld	h, #0x00
-                                   1524 ;	spillPairReg hl
-                                   1525 ;	spillPairReg hl
-      000847 19               [11] 1526 	add	hl, de
-      000848 29               [11] 1527 	add	hl, hl
-      000849 7C               [ 4] 1528 	ld	a, h
-      00084A F6 78            [ 7] 1529 	or	a, #0x78
-      00084C 67               [ 4] 1530 	ld	h, a
-                                   1531 ;	spillPairReg hl
-                                   1532 ;	spillPairReg hl
-      00084D 11 02 00         [10] 1533 	ld	de, #0x0002
-      000850 D5               [11] 1534 	push	de
-      000851 59               [ 4] 1535 	ld	e, c
-      000852 50               [ 4] 1536 	ld	d, b
-      000853 CDr00r00         [17] 1537 	call	_SMS_VRAMmemcpy
-      000856 18 29            [12] 1538 	jr	00126$
-      000858                       1539 00107$:
-                                   1540 ;main.c:266: SMS_loadTileMap(camera.coloffset - 32 + x,camera.rowoffset,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
-      000858 3Er00            [ 7] 1541 	ld	a, #<(_brawl_street_tilemap_bin)
-      00085A DD 86 FD         [19] 1542 	add	a, -3 (ix)
-      00085D 6F               [ 4] 1543 	ld	l, a
-                                   1544 ;	spillPairReg hl
-                                   1545 ;	spillPairReg hl
-      00085E 3Es00            [ 7] 1546 	ld	a, #>(_brawl_street_tilemap_bin)
-      000860 DD 8E FE         [19] 1547 	adc	a, -2 (ix)
-      000863 67               [ 4] 1548 	ld	h, a
-                                   1549 ;	spillPairReg hl
-                                   1550 ;	spillPairReg hl
-      000864 09               [11] 1551 	add	hl, bc
-      000865 4D               [ 4] 1552 	ld	c, l
-      000866 44               [ 4] 1553 	ld	b, h
-      000867 DD 7E FB         [19] 1554 	ld	a, -5 (ix)
-      00086A C6 E0            [ 7] 1555 	add	a, #0xe0
-      00086C DD 86 FC         [19] 1556 	add	a, -4 (ix)
-      00086F 26 00            [ 7] 1557 	ld	h, #0x00
-                                   1558 ;	spillPairReg hl
-                                   1559 ;	spillPairReg hl
-      000871 6F               [ 4] 1560 	ld	l, a
-                                   1561 ;	spillPairReg hl
-                                   1562 ;	spillPairReg hl
-      000872 19               [11] 1563 	add	hl, de
-      000873 29               [11] 1564 	add	hl, hl
-      000874 7C               [ 4] 1565 	ld	a, h
-      000875 F6 78            [ 7] 1566 	or	a, #0x78
-      000877 67               [ 4] 1567 	ld	h, a
-                                   1568 ;	spillPairReg hl
-                                   1569 ;	spillPairReg hl
-      000878 11 02 00         [10] 1570 	ld	de, #0x0002
-      00087B D5               [11] 1571 	push	de
-      00087C 59               [ 4] 1572 	ld	e, c
-      00087D 50               [ 4] 1573 	ld	d, b
-      00087E CDr00r00         [17] 1574 	call	_SMS_VRAMmemcpy
-      000881                       1575 00126$:
-                                   1576 ;main.c:258: for (unsigned char x = 0; x < 32; x++)
-      000881 DD 34 FF         [23] 1577 	inc	-1 (ix)
-      000884 C3rA1r07         [10] 1578 	jp	00125$
-      000887                       1579 00115$:
-                                   1580 ;main.c:271: camera.view_y++;
-      000887 DD 4E FD         [19] 1581 	ld	c, -3 (ix)
-      00088A DD 46 FE         [19] 1582 	ld	b, -2 (ix)
-      00088D 03               [ 6] 1583 	inc	bc
-      00088E ED 43r02r00      [20] 1584 	ld	((_camera + 2)), bc
-      000892                       1585 00117$:
-                                   1586 ;main.c:273: if (camera.rowoffset == 28)
-      000892 2Ar08r00         [16] 1587 	ld	hl, (#(_camera + 8) + 0)
-      000895 7D               [ 4] 1588 	ld	a, l
-      000896 D6 1C            [ 7] 1589 	sub	a, #0x1c
-      000898 B4               [ 4] 1590 	or	a, h
-      000899 20 06            [12] 1591 	jr	NZ, 00127$
-                                   1592 ;main.c:275: camera.rowoffset = 0;
-      00089B 21 00 00         [10] 1593 	ld	hl, #0x0000
-      00089E 22r08r00         [16] 1594 	ld	((_camera + 8)), hl
-      0008A1                       1595 00127$:
-                                   1596 ;main.c:278: }
-      0008A1 DD F9            [10] 1597 	ld	sp, ix
-      0008A3 DD E1            [14] 1598 	pop	ix
-      0008A5 C9               [10] 1599 	ret
-                                   1600 ;main.c:282: void main(void)
-                                   1601 ;	---------------------------------
-                                   1602 ; Function main
-                                   1603 ; ---------------------------------
-      0008A6                       1604 _main::
-                                   1605 ;main.c:285: SMS_displayOff();
-      0008A6 21 40 01         [10] 1606 	ld	hl, #0x0140
-      0008A9 CDr00r00         [17] 1607 	call	_SMS_VDPturnOffFeature
-                                   1608 ;main.c:287: SMS_VRAMmemsetW(0, 0x0000, 16384);
-      0008AC 21 00 40         [10] 1609 	ld	hl, #0x4000
-      0008AF E5               [11] 1610 	push	hl
-      0008B0 11 00 00         [10] 1611 	ld	de, #0x0000
-      0008B3 65               [ 4] 1612 	ld	h, l
-      0008B4 CDr00r00         [17] 1613 	call	_SMS_VRAMmemsetW
-                                   1614 ;main.c:288: SMS_zeroBGPalette();
-      0008B7 CDr00r00         [17] 1615 	call	_SMS_zeroBGPalette
-                                   1616 ;main.c:289: SMS_zeroSpritePalette();
-      0008BA CDr00r00         [17] 1617 	call	_SMS_zeroSpritePalette
-                                   1618 ;main.c:292: SMS_VDPturnOnFeature(VDPFEATURE_LEFTCOLBLANK);
-      0008BD 21 20 00         [10] 1619 	ld	hl, #0x0020
-      0008C0 CDr00r00         [17] 1620 	call	_SMS_VDPturnOnFeature
-                                   1621 ;main.c:293: SMS_VDPturnOnFeature(VDPFEATURE_HIDEFIRSTCOL);
-      0008C3 21 20 00         [10] 1622 	ld	hl, #0x0020
-      0008C6 CDr00r00         [17] 1623 	call	_SMS_VDPturnOnFeature
-                                   1624 ;main.c:295: SMS_mapROMBank(bg_pal_bin_bank);
-      0008C9 21 FF FF         [10] 1625 	ld	hl, #_ROM_bank_to_be_mapped_on_slot2
-      0008CC 36 03            [10] 1626 	ld	(hl), #0x03
-                                   1627 ;main.c:296: SMS_loadBGPalette(bg_pal_bin);
-      0008CE 21r00r00         [10] 1628 	ld	hl, #_bg_pal_bin
-      0008D1 CDr00r00         [17] 1629 	call	_SMS_loadBGPalette
-                                   1630 ;main.c:297: SMS_loadSpritePalette(spr_pal_bin);
-      0008D4 21r00r00         [10] 1631 	ld	hl, #_spr_pal_bin
-      0008D7 CDr00r00         [17] 1632 	call	_SMS_loadSpritePalette
-                                   1633 ;main.c:299: SMS_setBackdropColor(15);
-      0008DA 2E 0F            [ 7] 1634 	ld	l, #0x0f
-                                   1635 ;	spillPairReg hl
-                                   1636 ;	spillPairReg hl
-      0008DC CDr00r00         [17] 1637 	call	_SMS_setBackdropColor
-                                   1638 ;main.c:302: SMS_loadPSGaidencompressedTiles(font_8x8_psgcompr,192);
-      0008DF 11 00 58         [10] 1639 	ld	de, #0x5800
-      0008E2 21r00r00         [10] 1640 	ld	hl, #_font_8x8_psgcompr
-      0008E5 CDr00r00         [17] 1641 	call	_SMS_loadPSGaidencompressedTilesatAddr
-                                   1642 ;main.c:303: SMS_configureTextRenderer(160);
-      0008E8 21 A0 00         [10] 1643 	ld	hl, #0x00a0
-      0008EB CDr00r00         [17] 1644 	call	_SMS_configureTextRenderer
-                                   1645 ;main.c:307: SMS_mapROMBank(brawl_street_tiles_psgcompr_bank);
-      0008EE 21 FF FF         [10] 1646 	ld	hl, #_ROM_bank_to_be_mapped_on_slot2
-      0008F1 36 03            [10] 1647 	ld	(hl), #0x03
-                                   1648 ;main.c:308: SMS_loadPSGaidencompressedTiles(brawl_street_tiles_psgcompr,0);
-      0008F3 11 00 40         [10] 1649 	ld	de, #0x4000
-      0008F6 21r00r00         [10] 1650 	ld	hl, #_brawl_street_tiles_psgcompr
-      0008F9 CDr00r00         [17] 1651 	call	_SMS_loadPSGaidencompressedTilesatAddr
-                                   1652 ;main.c:309: redraw_stage(); //Draw map at current view position.
-      0008FC CDr2Er00         [17] 1653 	call	_redraw_stage
-                                   1654 ;main.c:312: init_camera();
-      0008FF CDr00r00         [17] 1655 	call	_init_camera
-                                   1656 ;main.c:315: SMS_displayOn();
-      000902 21 40 01         [10] 1657 	ld	hl, #0x0140
-      000905 CDr00r00         [17] 1658 	call	_SMS_VDPturnOnFeature
-      000908                       1659 00174$:
-                                   1660 ;main.c:321: if ((SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && (SMS_getKeysHeld() & PORT_A_KEY_DOWN) && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && camera.view_x < 130 && camera.view_y < 24)
-      000908 CDr00r00         [17] 1661 	call	_SMS_getKeysHeld
-      00090B CB 5B            [ 8] 1662 	bit	3, e
-      00090D 28 3F            [12] 1663 	jr	Z, 00131$
-      00090F CDr00r00         [17] 1664 	call	_SMS_getKeysHeld
-      000912 CB 4B            [ 8] 1665 	bit	1, e
-      000914 28 38            [12] 1666 	jr	Z, 00131$
-      000916 CDr00r00         [17] 1667 	call	_SMS_getKeysHeld
-      000919 CB 53            [ 8] 1668 	bit	2, e
-      00091B 20 31            [12] 1669 	jr	NZ, 00131$
-      00091D CDr00r00         [17] 1670 	call	_SMS_getKeysHeld
-      000920 CB 43            [ 8] 1671 	bit	0, e
-      000922 20 2A            [12] 1672 	jr	NZ, 00131$
-      000924 2Ar00r00         [16] 1673 	ld	hl, (#_camera + 0)
-      000927 11 82 00         [10] 1674 	ld	de, #0x0082
-      00092A BF               [ 4] 1675 	cp	a, a
-      00092B ED 52            [15] 1676 	sbc	hl, de
-      00092D 30 1F            [12] 1677 	jr	NC, 00131$
-      00092F 2Ar02r00         [16] 1678 	ld	hl, (#_camera + 2)
-      000932 11 18 80         [10] 1679 	ld	de, #0x8018
-      000935 29               [11] 1680 	add	hl, hl
-      000936 3F               [ 4] 1681 	ccf
-      000937 CB 1C            [ 8] 1682 	rr	h
-      000939 CB 1D            [ 8] 1683 	rr	l
-      00093B ED 52            [15] 1684 	sbc	hl, de
-      00093D 30 0F            [12] 1685 	jr	NC, 00131$
-                                   1686 ;main.c:323: camera.pan_dir = DOWN_RIGHT;
-      00093F 21 04 00         [10] 1687 	ld	hl, #0x0004
-      000942 22r0Ar00         [16] 1688 	ld	((_camera + 10)), hl
-                                   1689 ;main.c:324: cam_pan_down();
-      000945 CDr7Fr06         [17] 1690 	call	_cam_pan_down
-                                   1691 ;main.c:325: cam_pan_right();            
-      000948 CDr70r00         [17] 1692 	call	_cam_pan_right
-      00094B C3r23r0A         [10] 1693 	jp	00132$
-      00094E                       1694 00131$:
-                                   1695 ;main.c:327: else if ((SMS_getKeysHeld() & PORT_A_KEY_LEFT) && (SMS_getKeysHeld() & PORT_A_KEY_DOWN) && !(SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && camera.view_x > 0 && camera.view_y < 24)
-      00094E CDr00r00         [17] 1696 	call	_SMS_getKeysHeld
-      000951 CB 53            [ 8] 1697 	bit	2, e
-      000953 28 3B            [12] 1698 	jr	Z, 00123$
-      000955 CDr00r00         [17] 1699 	call	_SMS_getKeysHeld
-      000958 CB 4B            [ 8] 1700 	bit	1, e
-      00095A 28 34            [12] 1701 	jr	Z, 00123$
-      00095C CDr00r00         [17] 1702 	call	_SMS_getKeysHeld
-      00095F CB 5B            [ 8] 1703 	bit	3, e
-      000961 20 2D            [12] 1704 	jr	NZ, 00123$
-      000963 CDr00r00         [17] 1705 	call	_SMS_getKeysHeld
-      000966 CB 43            [ 8] 1706 	bit	0, e
-      000968 20 26            [12] 1707 	jr	NZ, 00123$
-      00096A 2Ar00r00         [16] 1708 	ld	hl, (#_camera + 0)
-      00096D 7C               [ 4] 1709 	ld	a, h
-      00096E B5               [ 4] 1710 	or	a, l
-      00096F 28 1F            [12] 1711 	jr	Z, 00123$
-      000971 2Ar02r00         [16] 1712 	ld	hl, (#_camera + 2)
-      000974 11 18 80         [10] 1713 	ld	de, #0x8018
-      000977 29               [11] 1714 	add	hl, hl
-      000978 3F               [ 4] 1715 	ccf
-      000979 CB 1C            [ 8] 1716 	rr	h
-      00097B CB 1D            [ 8] 1717 	rr	l
-      00097D ED 52            [15] 1718 	sbc	hl, de
-      00097F 30 0F            [12] 1719 	jr	NC, 00123$
-                                   1720 ;main.c:329: camera.pan_dir = DOWN_LEFT;
-      000981 21 05 00         [10] 1721 	ld	hl, #0x0005
-      000984 22r0Ar00         [16] 1722 	ld	((_camera + 10)), hl
-                                   1723 ;main.c:330: cam_pan_down();
-      000987 CDr7Fr06         [17] 1724 	call	_cam_pan_down
-                                   1725 ;main.c:331: cam_pan_left();       
-      00098A CDr75r02         [17] 1726 	call	_cam_pan_left
-      00098D C3r23r0A         [10] 1727 	jp	00132$
-      000990                       1728 00123$:
-                                   1729 ;main.c:333: else if ((SMS_getKeysHeld() & PORT_A_KEY_UP) && (SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && !(SMS_getKeysHeld() & PORT_A_KEY_DOWN) && camera.view_x > 0 && camera.scroll_y > 0)
-      000990 CDr00r00         [17] 1730 	call	_SMS_getKeysHeld
-      000993 CB 43            [ 8] 1731 	bit	0, e
-      000995 28 30            [12] 1732 	jr	Z, 00115$
-      000997 CDr00r00         [17] 1733 	call	_SMS_getKeysHeld
-      00099A CB 53            [ 8] 1734 	bit	2, e
-      00099C 28 29            [12] 1735 	jr	Z, 00115$
-      00099E CDr00r00         [17] 1736 	call	_SMS_getKeysHeld
-      0009A1 CB 5B            [ 8] 1737 	bit	3, e
-      0009A3 20 22            [12] 1738 	jr	NZ, 00115$
-      0009A5 CDr00r00         [17] 1739 	call	_SMS_getKeysHeld
-      0009A8 CB 4B            [ 8] 1740 	bit	1, e
-      0009AA 20 1B            [12] 1741 	jr	NZ, 00115$
-      0009AC 2Ar00r00         [16] 1742 	ld	hl, (#_camera + 0)
-      0009AF 7C               [ 4] 1743 	ld	a, h
-      0009B0 B5               [ 4] 1744 	or	a, l
-      0009B1 28 14            [12] 1745 	jr	Z, 00115$
-      0009B3 3Ar05r00         [13] 1746 	ld	a, (#_camera + 5)
-      0009B6 B7               [ 4] 1747 	or	a, a
-      0009B7 28 0E            [12] 1748 	jr	Z, 00115$
-                                   1749 ;main.c:335: camera.pan_dir = UP_LEFT;
-      0009B9 21 06 00         [10] 1750 	ld	hl, #0x0006
-      0009BC 22r0Ar00         [16] 1751 	ld	((_camera + 10)), hl
-                                   1752 ;main.c:336: cam_pan_up();
-      0009BF CDr69r04         [17] 1753 	call	_cam_pan_up
-                                   1754 ;main.c:337: cam_pan_left();
-      0009C2 CDr75r02         [17] 1755 	call	_cam_pan_left
-      0009C5 18 5C            [12] 1756 	jr	00132$
-      0009C7                       1757 00115$:
-                                   1758 ;main.c:339: else if ((SMS_getKeysHeld() & PORT_A_KEY_UP) && (SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_DOWN) && camera.view_x < 130 && camera.scroll_y > 0)
-      0009C7 CDr00r00         [17] 1759 	call	_SMS_getKeysHeld
-      0009CA CB 43            [ 8] 1760 	bit	0, e
-      0009CC 28 34            [12] 1761 	jr	Z, 00107$
-      0009CE CDr00r00         [17] 1762 	call	_SMS_getKeysHeld
-      0009D1 CB 5B            [ 8] 1763 	bit	3, e
-      0009D3 28 2D            [12] 1764 	jr	Z, 00107$
-      0009D5 CDr00r00         [17] 1765 	call	_SMS_getKeysHeld
-      0009D8 CB 53            [ 8] 1766 	bit	2, e
-      0009DA 20 26            [12] 1767 	jr	NZ, 00107$
-      0009DC CDr00r00         [17] 1768 	call	_SMS_getKeysHeld
-      0009DF CB 4B            [ 8] 1769 	bit	1, e
-      0009E1 20 1F            [12] 1770 	jr	NZ, 00107$
-      0009E3 2Ar00r00         [16] 1771 	ld	hl, (#_camera + 0)
-      0009E6 11 82 00         [10] 1772 	ld	de, #0x0082
-      0009E9 BF               [ 4] 1773 	cp	a, a
-      0009EA ED 52            [15] 1774 	sbc	hl, de
-      0009EC 30 14            [12] 1775 	jr	NC, 00107$
-      0009EE 3Ar05r00         [13] 1776 	ld	a, (#_camera + 5)
-      0009F1 B7               [ 4] 1777 	or	a, a
-      0009F2 28 0E            [12] 1778 	jr	Z, 00107$
-                                   1779 ;main.c:341: camera.pan_dir = UP_RIGHT;
-      0009F4 21 07 00         [10] 1780 	ld	hl, #0x0007
-      0009F7 22r0Ar00         [16] 1781 	ld	((_camera + 10)), hl
-                                   1782 ;main.c:342: cam_pan_up();
-      0009FA CDr69r04         [17] 1783 	call	_cam_pan_up
-                                   1784 ;main.c:343: cam_pan_right();            
-      0009FD CDr70r00         [17] 1785 	call	_cam_pan_right
-      000A00 18 21            [12] 1786 	jr	00132$
-      000A02                       1787 00107$:
-                                   1788 ;main.c:347: if (camera.pan_dir == DOWN_LEFT || camera.pan_dir == DOWN_RIGHT || camera.pan_dir == UP_LEFT || camera.pan_dir == UP_RIGHT)
-      000A02 2Ar0Ar00         [16] 1789 	ld	hl, (#(_camera + 10) + 0)
-      000A05 7D               [ 4] 1790 	ld	a, l
-      000A06 D6 05            [ 7] 1791 	sub	a, #0x05
-      000A08 B4               [ 4] 1792 	or	a, h
-      000A09 28 12            [12] 1793 	jr	Z, 00101$
-      000A0B 7D               [ 4] 1794 	ld	a, l
-      000A0C D6 04            [ 7] 1795 	sub	a, #0x04
-      000A0E B4               [ 4] 1796 	or	a, h
-      000A0F 28 0C            [12] 1797 	jr	Z, 00101$
-      000A11 7D               [ 4] 1798 	ld	a, l
-      000A12 D6 06            [ 7] 1799 	sub	a, #0x06
-      000A14 B4               [ 4] 1800 	or	a, h
-      000A15 28 06            [12] 1801 	jr	Z, 00101$
-      000A17 7D               [ 4] 1802 	ld	a, l
-      000A18 D6 07            [ 7] 1803 	sub	a, #0x07
-      000A1A B4               [ 4] 1804 	or	a, h
-      000A1B 20 06            [12] 1805 	jr	NZ, 00132$
-      000A1D                       1806 00101$:
-                                   1807 ;main.c:349: camera.pan_dir = -1;
-      000A1D 21 FF FF         [10] 1808 	ld	hl, #0xffff
-      000A20 22r0Ar00         [16] 1809 	ld	((_camera + 10)), hl
-      000A23                       1810 00132$:
-                                   1811 ;main.c:353: if (SMS_getKeysHeld() & PORT_A_KEY_RIGHT && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && !(SMS_getKeysHeld() & PORT_A_KEY_DOWN) && camera.pan_dir != DOWN_RIGHT && camera.pan_dir != DOWN_LEFT && camera.pan_dir != UP_RIGHT && camera.pan_dir != UP_LEFT)
-      000A23 CDr00r00         [17] 1812 	call	_SMS_getKeysHeld
-      000A26 CB 5B            [ 8] 1813 	bit	3, e
-      000A28 28 35            [12] 1814 	jr	Z, 00165$
-      000A2A CDr00r00         [17] 1815 	call	_SMS_getKeysHeld
-      000A2D CB 43            [ 8] 1816 	bit	0, e
-      000A2F 20 2E            [12] 1817 	jr	NZ, 00165$
-      000A31 CDr00r00         [17] 1818 	call	_SMS_getKeysHeld
-      000A34 CB 4B            [ 8] 1819 	bit	1, e
-      000A36 20 27            [12] 1820 	jr	NZ, 00165$
-      000A38 2Ar0Ar00         [16] 1821 	ld	hl, (#(_camera + 10) + 0)
-      000A3B 7D               [ 4] 1822 	ld	a, l
-      000A3C D6 04            [ 7] 1823 	sub	a, #0x04
-      000A3E B4               [ 4] 1824 	or	a, h
-      000A3F 28 1E            [12] 1825 	jr	Z, 00165$
-      000A41 7D               [ 4] 1826 	ld	a, l
-      000A42 D6 05            [ 7] 1827 	sub	a, #0x05
-      000A44 B4               [ 4] 1828 	or	a, h
-      000A45 28 18            [12] 1829 	jr	Z, 00165$
-      000A47 7D               [ 4] 1830 	ld	a, l
-      000A48 D6 07            [ 7] 1831 	sub	a, #0x07
-      000A4A B4               [ 4] 1832 	or	a, h
-      000A4B 28 12            [12] 1833 	jr	Z, 00165$
-      000A4D 7D               [ 4] 1834 	ld	a, l
-      000A4E D6 06            [ 7] 1835 	sub	a, #0x06
-      000A50 B4               [ 4] 1836 	or	a, h
-      000A51 28 0C            [12] 1837 	jr	Z, 00165$
-                                   1838 ;main.c:355: camera.pan_dir = RIGHT;
-      000A53 21 00 00         [10] 1839 	ld	hl, #0x0000
-      000A56 22r0Ar00         [16] 1840 	ld	((_camera + 10)), hl
-                                   1841 ;main.c:356: cam_pan_right();
-      000A59 CDr70r00         [17] 1842 	call	_cam_pan_right
-      000A5C C3r0Er0B         [10] 1843 	jp	00166$
-      000A5F                       1844 00165$:
-                                   1845 ;main.c:358: else if (SMS_getKeysHeld() & PORT_A_KEY_LEFT && !(SMS_getKeysHeld() & PORT_A_KEY_UP) && !(SMS_getKeysHeld() & PORT_A_KEY_DOWN) && camera.pan_dir != DOWN_RIGHT && camera.pan_dir != DOWN_LEFT && camera.pan_dir != UP_RIGHT && camera.pan_dir != UP_LEFT )
-      000A5F CDr00r00         [17] 1846 	call	_SMS_getKeysHeld
-      000A62 CB 53            [ 8] 1847 	bit	2, e
-      000A64 28 34            [12] 1848 	jr	Z, 00156$
-      000A66 CDr00r00         [17] 1849 	call	_SMS_getKeysHeld
-      000A69 CB 43            [ 8] 1850 	bit	0, e
-      000A6B 20 2D            [12] 1851 	jr	NZ, 00156$
-      000A6D CDr00r00         [17] 1852 	call	_SMS_getKeysHeld
-      000A70 CB 4B            [ 8] 1853 	bit	1, e
-      000A72 20 26            [12] 1854 	jr	NZ, 00156$
-      000A74 2Ar0Ar00         [16] 1855 	ld	hl, (#(_camera + 10) + 0)
-      000A77 7D               [ 4] 1856 	ld	a, l
-      000A78 D6 04            [ 7] 1857 	sub	a, #0x04
-      000A7A B4               [ 4] 1858 	or	a, h
-      000A7B 28 1D            [12] 1859 	jr	Z, 00156$
-      000A7D 7D               [ 4] 1860 	ld	a, l
-      000A7E D6 05            [ 7] 1861 	sub	a, #0x05
-      000A80 B4               [ 4] 1862 	or	a, h
-      000A81 28 17            [12] 1863 	jr	Z, 00156$
-      000A83 7D               [ 4] 1864 	ld	a, l
-      000A84 D6 07            [ 7] 1865 	sub	a, #0x07
-      000A86 B4               [ 4] 1866 	or	a, h
-      000A87 28 11            [12] 1867 	jr	Z, 00156$
-      000A89 7D               [ 4] 1868 	ld	a, l
-      000A8A D6 06            [ 7] 1869 	sub	a, #0x06
-      000A8C B4               [ 4] 1870 	or	a, h
-      000A8D 28 0B            [12] 1871 	jr	Z, 00156$
-                                   1872 ;main.c:360: camera.pan_dir = LEFT;
-      000A8F 21 01 00         [10] 1873 	ld	hl, #0x0001
-      000A92 22r0Ar00         [16] 1874 	ld	((_camera + 10)), hl
-                                   1875 ;main.c:361: cam_pan_left();
-      000A95 CDr75r02         [17] 1876 	call	_cam_pan_left
-      000A98 18 74            [12] 1877 	jr	00166$
-      000A9A                       1878 00156$:
-                                   1879 ;main.c:363: else if (SMS_getKeysHeld() & PORT_A_KEY_UP && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && camera.pan_dir != DOWN_RIGHT && camera.pan_dir != DOWN_LEFT && camera.pan_dir != UP_RIGHT && camera.pan_dir != UP_LEFT)
-      000A9A CDr00r00         [17] 1880 	call	_SMS_getKeysHeld
-      000A9D CB 43            [ 8] 1881 	bit	0, e
-      000A9F 28 34            [12] 1882 	jr	Z, 00147$
-      000AA1 CDr00r00         [17] 1883 	call	_SMS_getKeysHeld
-      000AA4 CB 53            [ 8] 1884 	bit	2, e
-      000AA6 20 2D            [12] 1885 	jr	NZ, 00147$
-      000AA8 CDr00r00         [17] 1886 	call	_SMS_getKeysHeld
-      000AAB CB 5B            [ 8] 1887 	bit	3, e
-      000AAD 20 26            [12] 1888 	jr	NZ, 00147$
-      000AAF 2Ar0Ar00         [16] 1889 	ld	hl, (#(_camera + 10) + 0)
-      000AB2 7D               [ 4] 1890 	ld	a, l
-      000AB3 D6 04            [ 7] 1891 	sub	a, #0x04
-      000AB5 B4               [ 4] 1892 	or	a, h
-      000AB6 28 1D            [12] 1893 	jr	Z, 00147$
-      000AB8 7D               [ 4] 1894 	ld	a, l
-      000AB9 D6 05            [ 7] 1895 	sub	a, #0x05
-      000ABB B4               [ 4] 1896 	or	a, h
-      000ABC 28 17            [12] 1897 	jr	Z, 00147$
-      000ABE 7D               [ 4] 1898 	ld	a, l
-      000ABF D6 07            [ 7] 1899 	sub	a, #0x07
-      000AC1 B4               [ 4] 1900 	or	a, h
-      000AC2 28 11            [12] 1901 	jr	Z, 00147$
-      000AC4 7D               [ 4] 1902 	ld	a, l
-      000AC5 D6 06            [ 7] 1903 	sub	a, #0x06
-      000AC7 B4               [ 4] 1904 	or	a, h
-      000AC8 28 0B            [12] 1905 	jr	Z, 00147$
-                                   1906 ;main.c:365: camera.pan_dir = UP;
-      000ACA 21 02 00         [10] 1907 	ld	hl, #0x0002
-      000ACD 22r0Ar00         [16] 1908 	ld	((_camera + 10)), hl
-                                   1909 ;main.c:366: cam_pan_up();
-      000AD0 CDr69r04         [17] 1910 	call	_cam_pan_up
-      000AD3 18 39            [12] 1911 	jr	00166$
-      000AD5                       1912 00147$:
-                                   1913 ;main.c:368: else if (SMS_getKeysHeld() & PORT_A_KEY_DOWN && !(SMS_getKeysHeld() & PORT_A_KEY_LEFT) && !(SMS_getKeysHeld() & PORT_A_KEY_RIGHT) && camera.pan_dir != DOWN_RIGHT && camera.pan_dir != DOWN_LEFT && camera.pan_dir != UP_RIGHT && camera.pan_dir != UP_LEFT)
-      000AD5 CDr00r00         [17] 1914 	call	_SMS_getKeysHeld
-      000AD8 CB 4B            [ 8] 1915 	bit	1, e
-      000ADA 28 32            [12] 1916 	jr	Z, 00166$
-      000ADC CDr00r00         [17] 1917 	call	_SMS_getKeysHeld
-      000ADF CB 53            [ 8] 1918 	bit	2, e
-      000AE1 20 2B            [12] 1919 	jr	NZ, 00166$
-      000AE3 CDr00r00         [17] 1920 	call	_SMS_getKeysHeld
-      000AE6 CB 5B            [ 8] 1921 	bit	3, e
-      000AE8 20 24            [12] 1922 	jr	NZ, 00166$
-      000AEA 2Ar0Ar00         [16] 1923 	ld	hl, (#(_camera + 10) + 0)
-      000AED 7D               [ 4] 1924 	ld	a, l
-      000AEE D6 04            [ 7] 1925 	sub	a, #0x04
-      000AF0 B4               [ 4] 1926 	or	a, h
-      000AF1 28 1B            [12] 1927 	jr	Z, 00166$
-      000AF3 7D               [ 4] 1928 	ld	a, l
-      000AF4 D6 05            [ 7] 1929 	sub	a, #0x05
-      000AF6 B4               [ 4] 1930 	or	a, h
-      000AF7 28 15            [12] 1931 	jr	Z, 00166$
-      000AF9 7D               [ 4] 1932 	ld	a, l
-      000AFA D6 07            [ 7] 1933 	sub	a, #0x07
-      000AFC B4               [ 4] 1934 	or	a, h
-      000AFD 28 0F            [12] 1935 	jr	Z, 00166$
-      000AFF 7D               [ 4] 1936 	ld	a, l
-      000B00 D6 06            [ 7] 1937 	sub	a, #0x06
-      000B02 B4               [ 4] 1938 	or	a, h
-      000B03 28 09            [12] 1939 	jr	Z, 00166$
-                                   1940 ;main.c:370: camera.pan_dir = DOWN;
-      000B05 21 03 00         [10] 1941 	ld	hl, #0x0003
-      000B08 22r0Ar00         [16] 1942 	ld	((_camera + 10)), hl
-                                   1943 ;main.c:371: cam_pan_down();
-      000B0B CDr7Fr06         [17] 1944 	call	_cam_pan_down
-      000B0E                       1945 00166$:
-                                   1946 ;main.c:373: SMS_waitForVBlank();
-      000B0E CDr00r00         [17] 1947 	call	_SMS_waitForVBlank
-                                   1948 ;main.c:375: SMS_setBGScrollX(camera.scroll_x);
-      000B11 21r04r00         [10] 1949 	ld	hl, #_camera + 4
-      000B14 6E               [ 7] 1950 	ld	l, (hl)
-                                   1951 ;	spillPairReg hl
-      000B15 CDr00r00         [17] 1952 	call	_SMS_setBGScrollX
-                                   1953 ;main.c:376: SMS_setBGScrollY(camera.scroll_y);
-      000B18 21r05r00         [10] 1954 	ld	hl, #_camera + 5
-      000B1B 6E               [ 7] 1955 	ld	l, (hl)
-                                   1956 ;	spillPairReg hl
-      000B1C CDr00r00         [17] 1957 	call	_SMS_setBGScrollY
-                                   1958 ;main.c:377: SMS_initSprites();
-      000B1F CDr00r00         [17] 1959 	call	_SMS_initSprites
-                                   1960 ;main.c:378: SMS_copySpritestoSAT();
-      000B22 CDr00r00         [17] 1961 	call	_SMS_copySpritestoSAT
-                                   1962 ;main.c:381: }
-      000B25 C3r08r09         [10] 1963 	jp	00174$
-                                   1964 	.area _CODE
-      000B28                       1965 __str_0:
-      000B28 4F 72 61 6E 67 65 52  1966 	.ascii "OrangeRevolt"
+      00011C 06 00            [ 7]  288 	ld	b, #0x00
+      00011E DD 7E FD         [19]  289 	ld	a, -3 (ix)
+      000121 95               [ 4]  290 	sub	a, l
+      000122 6F               [ 4]  291 	ld	l, a
+                                    292 ;	spillPairReg hl
+                                    293 ;	spillPairReg hl
+      000123 DD 7E FE         [19]  294 	ld	a, -2 (ix)
+      000126 98               [ 4]  295 	sbc	a, b
+      000127 67               [ 4]  296 	ld	h, a
+                                    297 ;	spillPairReg hl
+                                    298 ;	spillPairReg hl
+      000128 19               [11]  299 	add	hl, de
+      000129 29               [11]  300 	add	hl, hl
+      00012A 29               [11]  301 	add	hl, hl
+      00012B 29               [11]  302 	add	hl, hl
+      00012C 29               [11]  303 	add	hl, hl
+      00012D 29               [11]  304 	add	hl, hl
+      00012E EB               [ 4]  305 	ex	de,hl
+      00012F 3Ar06r00         [13]  306 	ld	a, (#(_camera + 6) + 0)
+      000132 26 00            [ 7]  307 	ld	h, #0x00
+                                    308 ;	spillPairReg hl
+                                    309 ;	spillPairReg hl
+      000134 6F               [ 4]  310 	ld	l, a
+                                    311 ;	spillPairReg hl
+                                    312 ;	spillPairReg hl
+      000135 19               [11]  313 	add	hl, de
+      000136 29               [11]  314 	add	hl, hl
+      000137 7C               [ 4]  315 	ld	a, h
+      000138 F6 78            [ 7]  316 	or	a, #0x78
+      00013A 67               [ 4]  317 	ld	h, a
+                                    318 ;	spillPairReg hl
+                                    319 ;	spillPairReg hl
+      00013B C5               [11]  320 	push	bc
+      00013C 11 02 00         [10]  321 	ld	de, #0x0002
+      00013F D5               [11]  322 	push	de
+      000140 FD E5            [15]  323 	push	iy
+      000142 D1               [10]  324 	pop	de
+      000143 CDr00r00         [17]  325 	call	_SMS_VRAMmemcpy
+      000146 C1               [10]  326 	pop	bc
+                                    327 ;main.c:74: for (unsigned char y = 0; y < 28; y++)
+      000147 DD 34 FF         [23]  328 	inc	-1 (ix)
+      00014A C3rABr00         [10]  329 	jp	00115$
+      00014D                        330 00104$:
+                                    331 ;main.c:84: camera.view_x+= 2;
+      00014D DD 4E FB         [19]  332 	ld	c, -5 (ix)
+      000150 DD 46 FC         [19]  333 	ld	b, -4 (ix)
+      000153 03               [ 6]  334 	inc	bc
+      000154 03               [ 6]  335 	inc	bc
+      000155 ED 43r00r00      [20]  336 	ld	(_camera), bc
+      000159                        337 00106$:
+                                    338 ;main.c:67: if (camera.scroll_x % 8 == 0 && camera.view_x < 128) //When scroll_x remainder is zero, it's time to place tiles. Also don't draw tiles when at map end.
+      000159 2Ar00r00         [16]  339 	ld	hl, (#_camera + 0)
+                                    340 ;main.c:86: if (camera.view_x < 128 || camera.view_x >= 128 && camera.scroll_x % 32 != 0)
+      00015C 11 80 00         [10]  341 	ld	de, #0x0080
+      00015F BF               [ 4]  342 	cp	a, a
+      000160 ED 52            [15]  343 	sbc	hl, de
+      000162 3E 00            [ 7]  344 	ld	a, #0x00
+      000164 17               [ 4]  345 	rla
+      000165 B7               [ 4]  346 	or	a, a
+      000166 20 0C            [12]  347 	jr	NZ, 00108$
+      000168 4F               [ 4]  348 	ld	c, a
+      000169 CB 41            [ 8]  349 	bit	0, c
+      00016B 20 28            [12]  350 	jr	NZ, 00109$
+      00016D 3Ar04r00         [13]  351 	ld	a, (#(_camera + 4) + 0)
+      000170 E6 1F            [ 7]  352 	and	a, #0x1f
+      000172 28 21            [12]  353 	jr	Z, 00109$
+      000174                        354 00108$:
+                                    355 ;main.c:88: camera.scroll_x--;
+      000174 3Ar04r00         [13]  356 	ld	a, (#(_camera + 4) + 0)
+      000177 3D               [ 4]  357 	dec	a
+      000178 32r04r00         [13]  358 	ld	(#(_camera + 4)),a
+                                    359 ;main.c:89: camera.coloffset = 32 - (camera.scroll_x / 8); //Get the position of the x scroll register in tiles.
+      00017B 4F               [ 4]  360 	ld	c, a
+      00017C 06 00            [ 7]  361 	ld	b, #0x00
+      00017E CB 28            [ 8]  362 	sra	b
+      000180 CB 19            [ 8]  363 	rr	c
+      000182 CB 28            [ 8]  364 	sra	b
+      000184 CB 19            [ 8]  365 	rr	c
+      000186 CB 28            [ 8]  366 	sra	b
+      000188 CB 19            [ 8]  367 	rr	c
+      00018A 3E 20            [ 7]  368 	ld	a, #0x20
+      00018C 91               [ 4]  369 	sub	a, c
+      00018D 4F               [ 4]  370 	ld	c, a
+      00018E 9F               [ 4]  371 	sbc	a, a
+      00018F 90               [ 4]  372 	sub	a, b
+      000190 47               [ 4]  373 	ld	b, a
+      000191 ED 43r06r00      [20]  374 	ld	((_camera + 6)), bc
+      000195                        375 00109$:
+                                    376 ;main.c:93: if (camera.coloffset == 32)
+      000195 2Ar06r00         [16]  377 	ld	hl, (#(_camera + 6) + 0)
+      000198 7D               [ 4]  378 	ld	a, l
+      000199 D6 20            [ 7]  379 	sub	a, #0x20
+      00019B B4               [ 4]  380 	or	a, h
+      00019C 20 06            [12]  381 	jr	NZ, 00117$
+                                    382 ;main.c:95: camera.coloffset = 0;
+      00019E 21 00 00         [10]  383 	ld	hl, #0x0000
+      0001A1 22r06r00         [16]  384 	ld	((_camera + 6)), hl
+      0001A4                        385 00117$:
+                                    386 ;main.c:98: }
+      0001A4 DD F9            [10]  387 	ld	sp, ix
+      0001A6 DD E1            [14]  388 	pop	ix
+      0001A8 C9               [10]  389 	ret
+                                    390 ;main.c:100: void cam_pan_left(void)
+                                    391 ;	---------------------------------
+                                    392 ; Function cam_pan_left
+                                    393 ; ---------------------------------
+      0001A9                        394 _cam_pan_left::
+      0001A9 DD E5            [15]  395 	push	ix
+      0001AB DD 21 00 00      [14]  396 	ld	ix,#0
+      0001AF DD 39            [15]  397 	add	ix,sp
+      0001B1 21 FA FF         [10]  398 	ld	hl, #-6
+      0001B4 39               [11]  399 	add	hl, sp
+      0001B5 F9               [ 6]  400 	ld	sp, hl
+                                    401 ;main.c:102: if (camera.view_x > 0)
+      0001B6 2Ar00r00         [16]  402 	ld	hl, (#_camera + 0)
+      0001B9 7C               [ 4]  403 	ld	a, h
+      0001BA B5               [ 4]  404 	or	a, l
+      0001BB 28 06            [12]  405 	jr	Z, 00102$
+                                    406 ;main.c:104: camera.scroll_x++;
+      0001BD 01r04r00         [10]  407 	ld	bc, #_camera+4
+      0001C0 0A               [ 7]  408 	ld	a, (bc)
+      0001C1 3C               [ 4]  409 	inc	a
+      0001C2 02               [ 7]  410 	ld	(bc), a
+      0001C3                        411 00102$:
+                                    412 ;main.c:107: camera.coloffset = 32 - (camera.scroll_x / 8); //Get the position of the x scroll register in tiles.
+      0001C3 01r04r00         [10]  413 	ld	bc, #_camera + 4
+      0001C6 0A               [ 7]  414 	ld	a, (bc)
+      0001C7 5F               [ 4]  415 	ld	e, a
+      0001C8 16 00            [ 7]  416 	ld	d, #0x00
+      0001CA CB 2A            [ 8]  417 	sra	d
+      0001CC CB 1B            [ 8]  418 	rr	e
+      0001CE CB 2A            [ 8]  419 	sra	d
+      0001D0 CB 1B            [ 8]  420 	rr	e
+      0001D2 CB 2A            [ 8]  421 	sra	d
+      0001D4 CB 1B            [ 8]  422 	rr	e
+      0001D6 21 20 00         [10]  423 	ld	hl, #0x0020
+      0001D9 BF               [ 4]  424 	cp	a, a
+      0001DA ED 52            [15]  425 	sbc	hl, de
+      0001DC EB               [ 4]  426 	ex	de, hl
+      0001DD ED 53r06r00      [20]  427 	ld	((_camera + 6)), de
+                                    428 ;main.c:108: if (camera.coloffset == 32)
+      0001E1 7B               [ 4]  429 	ld	a, e
+      0001E2 D6 20            [ 7]  430 	sub	a, #0x20
+      0001E4 B2               [ 4]  431 	or	a, d
+      0001E5 20 06            [12]  432 	jr	NZ, 00104$
+                                    433 ;main.c:110: camera.coloffset = 0;
+      0001E7 21 00 00         [10]  434 	ld	hl, #0x0000
+      0001EA 22r06r00         [16]  435 	ld	((_camera + 6)), hl
+      0001ED                        436 00104$:
+                                    437 ;main.c:113: if (camera.scroll_x % 8 == 0 && camera.view_x > 0)
+      0001ED 0A               [ 7]  438 	ld	a, (bc)
+      0001EE E6 07            [ 7]  439 	and	a, #0x07
+      0001F0 C2rC5r02         [10]  440 	jp	NZ,00115$
+      0001F3 2Ar00r00         [16]  441 	ld	hl, (#_camera + 0)
+      0001F6 7C               [ 4]  442 	ld	a, h
+      0001F7 B5               [ 4]  443 	or	a, l
+      0001F8 CArC5r02         [10]  444 	jp	Z, 00115$
+                                    445 ;main.c:115: camera.rowoffset = (camera.scroll_y / 8);
+      0001FB 3Ar05r00         [13]  446 	ld	a, (#_camera + 5)
+      0001FE 4F               [ 4]  447 	ld	c, a
+      0001FF 06 00            [ 7]  448 	ld	b, #0x00
+      000201 CB 28            [ 8]  449 	sra	b
+      000203 CB 19            [ 8]  450 	rr	c
+      000205 CB 28            [ 8]  451 	sra	b
+      000207 CB 19            [ 8]  452 	rr	c
+      000209 CB 28            [ 8]  453 	sra	b
+      00020B CB 19            [ 8]  454 	rr	c
+      00020D ED 43r08r00      [20]  455 	ld	((_camera + 8)), bc
+                                    456 ;main.c:118: unsigned char rowoffset = camera.rowoffset; //Save the last state of rowoffset in a temp variable.
+                                    457 ;main.c:119: unsigned char ydex = 0; //We store the current y loop position, in order to subtract from the loop, to start at zero again when at last tile position.
+      000211 DD 36 FA 00      [19]  458 	ld	-6 (ix), #0x00
+                                    459 ;main.c:120: for (unsigned char y = 0; y < 28; y++)
+      000215 DD 36 FF 00      [19]  460 	ld	-1 (ix), #0x00
+      000219                        461 00113$:
+                                    462 ;main.c:113: if (camera.scroll_x % 8 == 0 && camera.view_x > 0)
+      000219 2Ar00r00         [16]  463 	ld	hl, (#_camera + 0)
+                                    464 ;main.c:127: SMS_loadTileMap(camera.coloffset,rowoffset + (y - ydex),brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);            
+      00021C 7D               [ 4]  465 	ld	a, l
+      00021D C6 FE            [ 7]  466 	add	a, #0xfe
+      00021F DD 77 FB         [19]  467 	ld	-5 (ix), a
+      000222 7C               [ 4]  468 	ld	a, h
+      000223 CE FF            [ 7]  469 	adc	a, #0xff
+      000225 DD 77 FC         [19]  470 	ld	-4 (ix), a
+                                    471 ;main.c:120: for (unsigned char y = 0; y < 28; y++)
+      000228 DD 7E FF         [19]  472 	ld	a, -1 (ix)
+      00022B D6 1C            [ 7]  473 	sub	a, #0x1c
+      00022D D2rB9r02         [10]  474 	jp	NC, 00108$
+                                    475 ;main.c:122: if (y >= 28 - rowoffset && rowoffset != 0)//When screen is offset, as the loop reaches the edge of the screen, we need to reset the loop so it begins at zero to finish off tiling.
+      000230 59               [ 4]  476 	ld	e, c
+      000231 16 00            [ 7]  477 	ld	d, #0x00
+      000233 21 1C 00         [10]  478 	ld	hl, #0x001c
+      000236 BF               [ 4]  479 	cp	a, a
+      000237 ED 52            [15]  480 	sbc	hl, de
+      000239 DD 7E FF         [19]  481 	ld	a, -1 (ix)
+      00023C DD 77 FD         [19]  482 	ld	-3 (ix), a
+      00023F DD 36 FE 00      [19]  483 	ld	-2 (ix), #0x00
+      000243 DD 7E FD         [19]  484 	ld	a, -3 (ix)
+      000246 95               [ 4]  485 	sub	a, l
+      000247 DD 7E FE         [19]  486 	ld	a, -2 (ix)
+      00024A 9C               [ 4]  487 	sbc	a, h
+      00024B E2r50r02         [10]  488 	jp	PO, 00184$
+      00024E EE 80            [ 7]  489 	xor	a, #0x80
+      000250                        490 00184$:
+      000250 FAr5Fr02         [10]  491 	jp	M, 00106$
+      000253 79               [ 4]  492 	ld	a, c
+      000254 B7               [ 4]  493 	or	a, a
+      000255 28 08            [12]  494 	jr	Z, 00106$
+                                    495 ;main.c:124: rowoffset = 0; //removes the offset from the equation. we need to start at zero.
+      000257 0E 00            [ 7]  496 	ld	c, #0x00
+                                    497 ;main.c:125: ydex = y; //store the y loop current index, to subtract it.
+      000259 DD 7E FF         [19]  498 	ld	a, -1 (ix)
+      00025C DD 77 FA         [19]  499 	ld	-6 (ix), a
+      00025F                        500 00106$:
+                                    501 ;main.c:127: SMS_loadTileMap(camera.coloffset,rowoffset + (y - ydex),brawl_street_tilemap_bin + (camera.view_x - 2) + (((y + camera.view_y) * 96) * 2),2);            
+      00025F FD 21r00r00      [14]  502 	ld	iy, #_brawl_street_tilemap_bin
+      000263 DD 5E FB         [19]  503 	ld	e, -5 (ix)
+      000266 DD 56 FC         [19]  504 	ld	d, -4 (ix)
+      000269 FD 19            [15]  505 	add	iy, de
+      00026B 2Ar02r00         [16]  506 	ld	hl, (#_camera + 2)
+      00026E DD 5E FD         [19]  507 	ld	e, -3 (ix)
+      000271 DD 56 FE         [19]  508 	ld	d, -2 (ix)
+      000274 19               [11]  509 	add	hl, de
+      000275 5D               [ 4]  510 	ld	e, l
+      000276 54               [ 4]  511 	ld	d, h
+      000277 29               [11]  512 	add	hl, hl
+      000278 19               [11]  513 	add	hl, de
+      000279 29               [11]  514 	add	hl, hl
+      00027A 29               [11]  515 	add	hl, hl
+      00027B 29               [11]  516 	add	hl, hl
+      00027C 29               [11]  517 	add	hl, hl
+      00027D 29               [11]  518 	add	hl, hl
+      00027E 29               [11]  519 	add	hl, hl
+      00027F EB               [ 4]  520 	ex	de, hl
+      000280 FD 19            [15]  521 	add	iy, de
+      000282 59               [ 4]  522 	ld	e, c
+      000283 16 00            [ 7]  523 	ld	d, #0x00
+      000285 DD 6E FA         [19]  524 	ld	l, -6 (ix)
+                                    525 ;	spillPairReg hl
+                                    526 ;	spillPairReg hl
+      000288 06 00            [ 7]  527 	ld	b, #0x00
+      00028A DD 7E FD         [19]  528 	ld	a, -3 (ix)
+      00028D 95               [ 4]  529 	sub	a, l
+      00028E 6F               [ 4]  530 	ld	l, a
+                                    531 ;	spillPairReg hl
+                                    532 ;	spillPairReg hl
+      00028F DD 7E FE         [19]  533 	ld	a, -2 (ix)
+      000292 98               [ 4]  534 	sbc	a, b
+      000293 67               [ 4]  535 	ld	h, a
+                                    536 ;	spillPairReg hl
+                                    537 ;	spillPairReg hl
+      000294 19               [11]  538 	add	hl, de
+      000295 29               [11]  539 	add	hl, hl
+      000296 29               [11]  540 	add	hl, hl
+      000297 29               [11]  541 	add	hl, hl
+      000298 29               [11]  542 	add	hl, hl
+      000299 29               [11]  543 	add	hl, hl
+      00029A EB               [ 4]  544 	ex	de,hl
+      00029B 3Ar06r00         [13]  545 	ld	a, (#(_camera + 6) + 0)
+      00029E 26 00            [ 7]  546 	ld	h, #0x00
+                                    547 ;	spillPairReg hl
+                                    548 ;	spillPairReg hl
+      0002A0 6F               [ 4]  549 	ld	l, a
+                                    550 ;	spillPairReg hl
+                                    551 ;	spillPairReg hl
+      0002A1 19               [11]  552 	add	hl, de
+      0002A2 29               [11]  553 	add	hl, hl
+      0002A3 7C               [ 4]  554 	ld	a, h
+      0002A4 F6 78            [ 7]  555 	or	a, #0x78
+      0002A6 67               [ 4]  556 	ld	h, a
+                                    557 ;	spillPairReg hl
+                                    558 ;	spillPairReg hl
+      0002A7 C5               [11]  559 	push	bc
+      0002A8 11 02 00         [10]  560 	ld	de, #0x0002
+      0002AB D5               [11]  561 	push	de
+      0002AC FD E5            [15]  562 	push	iy
+      0002AE D1               [10]  563 	pop	de
+      0002AF CDr00r00         [17]  564 	call	_SMS_VRAMmemcpy
+      0002B2 C1               [10]  565 	pop	bc
+                                    566 ;main.c:120: for (unsigned char y = 0; y < 28; y++)
+      0002B3 DD 34 FF         [23]  567 	inc	-1 (ix)
+      0002B6 C3r19r02         [10]  568 	jp	00113$
+      0002B9                        569 00108$:
+                                    570 ;main.c:130: camera.view_x-= 2;
+      0002B9 21r00r00         [10]  571 	ld	hl, #_camera
+      0002BC DD 7E FB         [19]  572 	ld	a, -5 (ix)
+      0002BF 77               [ 7]  573 	ld	(hl), a
+      0002C0 23               [ 6]  574 	inc	hl
+      0002C1 DD 7E FC         [19]  575 	ld	a, -4 (ix)
+      0002C4 77               [ 7]  576 	ld	(hl), a
+      0002C5                        577 00115$:
+                                    578 ;main.c:133: }
+      0002C5 DD F9            [10]  579 	ld	sp, ix
+      0002C7 DD E1            [14]  580 	pop	ix
+      0002C9 C9               [10]  581 	ret
+                                    582 ;main.c:135: void cam_pan_up(void)
+                                    583 ;	---------------------------------
+                                    584 ; Function cam_pan_up
+                                    585 ; ---------------------------------
+      0002CA                        586 _cam_pan_up::
+      0002CA DD E5            [15]  587 	push	ix
+      0002CC DD 21 00 00      [14]  588 	ld	ix,#0
+      0002D0 DD 39            [15]  589 	add	ix,sp
+      0002D2 F5               [11]  590 	push	af
+      0002D3 F5               [11]  591 	push	af
+                                    592 ;main.c:137: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register.
+      0002D4 3Ar05r00         [13]  593 	ld	a, (#(_camera + 5) + 0)
+      0002D7 4F               [ 4]  594 	ld	c, a
+      0002D8 06 00            [ 7]  595 	ld	b, #0x00
+      0002DA CB 28            [ 8]  596 	sra	b
+      0002DC CB 19            [ 8]  597 	rr	c
+      0002DE CB 28            [ 8]  598 	sra	b
+      0002E0 CB 19            [ 8]  599 	rr	c
+      0002E2 CB 28            [ 8]  600 	sra	b
+      0002E4 CB 19            [ 8]  601 	rr	c
+      0002E6 3E 1C            [ 7]  602 	ld	a, #0x1c
+      0002E8 91               [ 4]  603 	sub	a, c
+      0002E9 4F               [ 4]  604 	ld	c, a
+      0002EA 9F               [ 4]  605 	sbc	a, a
+      0002EB 90               [ 4]  606 	sub	a, b
+      0002EC 47               [ 4]  607 	ld	b, a
+      0002ED ED 43r08r00      [20]  608 	ld	((_camera + 8)), bc
+                                    609 ;main.c:139: if (camera.rowoffset == 28) //Tile placement is from 0-27. So when it hits 28 we need to reset the rowoffset.
+      0002F1 79               [ 4]  610 	ld	a, c
+      0002F2 D6 1C            [ 7]  611 	sub	a, #0x1c
+      0002F4 B0               [ 4]  612 	or	a, b
+      0002F5 20 06            [12]  613 	jr	NZ, 00102$
+                                    614 ;main.c:141: camera.rowoffset = 0;
+      0002F7 21 00 00         [10]  615 	ld	hl, #0x0000
+      0002FA 22r08r00         [16]  616 	ld	((_camera + 8)), hl
+      0002FD                        617 00102$:
+                                    618 ;main.c:145: if (camera.scroll_y % 8 == 0 && camera.view_y > 0)
+      0002FD 3Ar05r00         [13]  619 	ld	a, (#(_camera + 5) + 0)
+      000300 4F               [ 4]  620 	ld	c, a
+      000301 06 00            [ 7]  621 	ld	b, #0x00
+      000303 79               [ 4]  622 	ld	a, c
+      000304 E6 07            [ 7]  623 	and	a, #0x07
+      000306 5F               [ 4]  624 	ld	e, a
+      000307 16 00            [ 7]  625 	ld	d, #0x00
+      000309 7A               [ 4]  626 	ld	a, d
+      00030A B3               [ 4]  627 	or	a, e
+      00030B C2rCCr03         [10]  628 	jp	NZ, 00108$
+      00030E 2Ar02r00         [16]  629 	ld	hl, (#(_camera + 2) + 0)
+      000311 AF               [ 4]  630 	xor	a, a
+      000312 BD               [ 4]  631 	cp	a, l
+      000313 9C               [ 4]  632 	sbc	a, h
+      000314 E2r19r03         [10]  633 	jp	PO, 00192$
+      000317 EE 80            [ 7]  634 	xor	a, #0x80
+      000319                        635 00192$:
+      000319 F2rCCr03         [10]  636 	jp	P, 00108$
+                                    637 ;main.c:147: camera.rowoffset = (camera.scroll_y / 8);
+      00031C CB 28            [ 8]  638 	sra	b
+      00031E CB 19            [ 8]  639 	rr	c
+      000320 CB 28            [ 8]  640 	sra	b
+      000322 CB 19            [ 8]  641 	rr	c
+      000324 CB 28            [ 8]  642 	sra	b
+      000326 CB 19            [ 8]  643 	rr	c
+      000328 ED 43r08r00      [20]  644 	ld	((_camera + 8)), bc
+                                    645 ;main.c:149: unsigned char coloffset = camera.coloffset; //Save the last state of coloffset in a temp variable.
+      00032C 21r06r00         [10]  646 	ld	hl, #_camera + 6
+      00032F 4E               [ 7]  647 	ld	c, (hl)
+                                    648 ;main.c:150: unsigned char xdex = 0; //We store the current x loop position, in order to subtract from the loop, to start at zero again when at last tile position.
+      000330 DD 36 FC 00      [19]  649 	ld	-4 (ix), #0x00
+                                    650 ;main.c:152: for (unsigned char x = 0; x < 32; x++)
+      000334 DD 36 FF 00      [19]  651 	ld	-1 (ix), #0x00
+      000338                        652 00116$:
+                                    653 ;main.c:159: SMS_loadTileMap(coloffset + (x - xdex),camera.rowoffset - 1,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);         
+      000338 2Ar02r00         [16]  654 	ld	hl, (#(_camera + 2) + 0)
+      00033B 7D               [ 4]  655 	ld	a, l
+      00033C C6 FF            [ 7]  656 	add	a, #0xff
+      00033E DD 77 FD         [19]  657 	ld	-3 (ix), a
+      000341 7C               [ 4]  658 	ld	a, h
+      000342 CE FF            [ 7]  659 	adc	a, #0xff
+      000344 DD 77 FE         [19]  660 	ld	-2 (ix), a
+                                    661 ;main.c:152: for (unsigned char x = 0; x < 32; x++)
+      000347 DD 7E FF         [19]  662 	ld	a, -1 (ix)
+      00034A D6 20            [ 7]  663 	sub	a, #0x20
+      00034C 30 72            [12]  664 	jr	NC, 00106$
+                                    665 ;main.c:154: if (x >= 32 - coloffset && coloffset != 0)//When screen is offset, as the loop reaches the edge of the screen, we need to reset the loop so it begins at zero to finish off tiling.
+      00034E 59               [ 4]  666 	ld	e, c
+      00034F 16 00            [ 7]  667 	ld	d, #0x00
+      000351 21 20 00         [10]  668 	ld	hl, #0x0020
+      000354 BF               [ 4]  669 	cp	a, a
+      000355 ED 52            [15]  670 	sbc	hl, de
+      000357 DD 5E FF         [19]  671 	ld	e, -1 (ix)
+      00035A 16 00            [ 7]  672 	ld	d, #0x00
+      00035C 7B               [ 4]  673 	ld	a, e
+      00035D 95               [ 4]  674 	sub	a, l
+      00035E 7A               [ 4]  675 	ld	a, d
+      00035F 9C               [ 4]  676 	sbc	a, h
+      000360 E2r65r03         [10]  677 	jp	PO, 00193$
+      000363 EE 80            [ 7]  678 	xor	a, #0x80
+      000365                        679 00193$:
+      000365 FAr74r03         [10]  680 	jp	M, 00104$
+      000368 79               [ 4]  681 	ld	a, c
+      000369 B7               [ 4]  682 	or	a, a
+      00036A 28 08            [12]  683 	jr	Z, 00104$
+                                    684 ;main.c:156: coloffset = 0; //removes the offset from the equation. we need to start at zero.
+      00036C 0E 00            [ 7]  685 	ld	c, #0x00
+                                    686 ;main.c:157: xdex = x; //store the x loop current index, to subtract it.
+      00036E DD 7E FF         [19]  687 	ld	a, -1 (ix)
+      000371 DD 77 FC         [19]  688 	ld	-4 (ix), a
+      000374                        689 00104$:
+                                    690 ;main.c:159: SMS_loadTileMap(coloffset + (x - xdex),camera.rowoffset - 1,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y - 1) * 96) * 2),2);         
+      000374 2Ar00r00         [16]  691 	ld	hl, (#_camera + 0)
+      000377 EB               [ 4]  692 	ex	de, hl
+      000378 29               [11]  693 	add	hl, hl
+      000379 EB               [ 4]  694 	ex	de, hl
+      00037A 19               [11]  695 	add	hl, de
+      00037B EB               [ 4]  696 	ex	de, hl
+      00037C FD 21r00r00      [14]  697 	ld	iy, #_brawl_street_tilemap_bin
+      000380 FD 19            [15]  698 	add	iy, de
+      000382 DD 5E FD         [19]  699 	ld	e, -3 (ix)
+      000385 DD 56 FE         [19]  700 	ld	d, -2 (ix)
+      000388 6B               [ 4]  701 	ld	l, e
+      000389 62               [ 4]  702 	ld	h, d
+      00038A 29               [11]  703 	add	hl, hl
+      00038B 19               [11]  704 	add	hl, de
+      00038C 29               [11]  705 	add	hl, hl
+      00038D 29               [11]  706 	add	hl, hl
+      00038E 29               [11]  707 	add	hl, hl
+      00038F 29               [11]  708 	add	hl, hl
+      000390 29               [11]  709 	add	hl, hl
+      000391 29               [11]  710 	add	hl, hl
+      000392 EB               [ 4]  711 	ex	de, hl
+      000393 FD 19            [15]  712 	add	iy, de
+      000395 2Ar08r00         [16]  713 	ld	hl, (#(_camera + 8) + 0)
+      000398 2B               [ 6]  714 	dec	hl
+      000399 29               [11]  715 	add	hl, hl
+      00039A 29               [11]  716 	add	hl, hl
+      00039B 29               [11]  717 	add	hl, hl
+      00039C 29               [11]  718 	add	hl, hl
+      00039D 29               [11]  719 	add	hl, hl
+      00039E DD 7E FF         [19]  720 	ld	a, -1 (ix)
+      0003A1 DD 96 FC         [19]  721 	sub	a, -4 (ix)
+      0003A4 81               [ 4]  722 	add	a, c
+      0003A5 16 00            [ 7]  723 	ld	d, #0x00
+      0003A7 5F               [ 4]  724 	ld	e, a
+      0003A8 19               [11]  725 	add	hl, de
+      0003A9 29               [11]  726 	add	hl, hl
+      0003AA 7C               [ 4]  727 	ld	a, h
+      0003AB F6 78            [ 7]  728 	or	a, #0x78
+      0003AD 67               [ 4]  729 	ld	h, a
+                                    730 ;	spillPairReg hl
+                                    731 ;	spillPairReg hl
+      0003AE C5               [11]  732 	push	bc
+      0003AF 11 02 00         [10]  733 	ld	de, #0x0002
+      0003B2 D5               [11]  734 	push	de
+      0003B3 FD E5            [15]  735 	push	iy
+      0003B5 D1               [10]  736 	pop	de
+      0003B6 CDr00r00         [17]  737 	call	_SMS_VRAMmemcpy
+      0003B9 C1               [10]  738 	pop	bc
+                                    739 ;main.c:152: for (unsigned char x = 0; x < 32; x++)
+      0003BA DD 34 FF         [23]  740 	inc	-1 (ix)
+      0003BD C3r38r03         [10]  741 	jp	00116$
+      0003C0                        742 00106$:
+                                    743 ;main.c:162: camera.view_y--;
+      0003C0 21r02r00         [10]  744 	ld	hl, #(_camera + 2)
+      0003C3 DD 7E FD         [19]  745 	ld	a, -3 (ix)
+      0003C6 77               [ 7]  746 	ld	(hl), a
+      0003C7 23               [ 6]  747 	inc	hl
+      0003C8 DD 7E FE         [19]  748 	ld	a, -2 (ix)
+      0003CB 77               [ 7]  749 	ld	(hl), a
+      0003CC                        750 00108$:
+                                    751 ;main.c:165: if (camera.view_y > 0 || camera.scroll_y % 32 != 0)
+      0003CC ED 4Br02r00      [20]  752 	ld	bc, (#(_camera + 2) + 0)
+                                    753 ;main.c:137: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register.
+      0003D0 21r05r00         [10]  754 	ld	hl, #(_camera + 5)
+      0003D3 5E               [ 7]  755 	ld	e, (hl)
+                                    756 ;main.c:165: if (camera.view_y > 0 || camera.scroll_y % 32 != 0)
+      0003D4 AF               [ 4]  757 	xor	a, a
+      0003D5 B9               [ 4]  758 	cp	a, c
+      0003D6 98               [ 4]  759 	sbc	a, b
+      0003D7 E2rDCr03         [10]  760 	jp	PO, 00194$
+      0003DA EE 80            [ 7]  761 	xor	a, #0x80
+      0003DC                        762 00194$:
+      0003DC FArE4r03         [10]  763 	jp	M, 00112$
+      0003DF 7B               [ 4]  764 	ld	a, e
+      0003E0 E6 1F            [ 7]  765 	and	a, #0x1f
+      0003E2 28 0C            [12]  766 	jr	Z, 00118$
+      0003E4                        767 00112$:
+                                    768 ;main.c:168: camera.scroll_y--;
+      0003E4 1D               [ 4]  769 	dec	e
+      0003E5 21r05r00         [10]  770 	ld	hl, #(_camera + 5)
+      0003E8 73               [ 7]  771 	ld	(hl), e
+                                    772 ;main.c:169: if (camera.scroll_y > 223)
+      0003E9 3E DF            [ 7]  773 	ld	a, #0xdf
+      0003EB 93               [ 4]  774 	sub	a, e
+      0003EC 30 02            [12]  775 	jr	NC, 00118$
+                                    776 ;main.c:171: camera.scroll_y = 223;
+      0003EE 36 DF            [10]  777 	ld	(hl), #0xdf
+      0003F0                        778 00118$:
+                                    779 ;main.c:175: }
+      0003F0 DD F9            [10]  780 	ld	sp, ix
+      0003F2 DD E1            [14]  781 	pop	ix
+      0003F4 C9               [10]  782 	ret
+                                    783 ;main.c:177: void cam_pan_down(void)
+                                    784 ;	---------------------------------
+                                    785 ; Function cam_pan_down
+                                    786 ; ---------------------------------
+      0003F5                        787 _cam_pan_down::
+      0003F5 DD E5            [15]  788 	push	ix
+      0003F7 DD 21 00 00      [14]  789 	ld	ix,#0
+      0003FB DD 39            [15]  790 	add	ix,sp
+      0003FD F5               [11]  791 	push	af
+      0003FE F5               [11]  792 	push	af
+                                    793 ;main.c:180: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register in tiles.
+      0003FF 01r05r00         [10]  794 	ld	bc, #_camera + 5
+      000402 0A               [ 7]  795 	ld	a, (bc)
+      000403 5F               [ 4]  796 	ld	e, a
+      000404 16 00            [ 7]  797 	ld	d, #0x00
+      000406 CB 2A            [ 8]  798 	sra	d
+      000408 CB 1B            [ 8]  799 	rr	e
+      00040A CB 2A            [ 8]  800 	sra	d
+      00040C CB 1B            [ 8]  801 	rr	e
+      00040E CB 2A            [ 8]  802 	sra	d
+      000410 CB 1B            [ 8]  803 	rr	e
+      000412 21 1C 00         [10]  804 	ld	hl, #0x001c
+      000415 BF               [ 4]  805 	cp	a, a
+      000416 ED 52            [15]  806 	sbc	hl, de
+      000418 EB               [ 4]  807 	ex	de, hl
+      000419 ED 53r08r00      [20]  808 	ld	((_camera + 8)), de
+                                    809 ;main.c:182: if (camera.view_y < 24) //Prvent the scrolling from going past the height of the map. 24 tiles = 192 pixels
+      00041D 2Ar02r00         [16]  810 	ld	hl, (#(_camera + 2) + 0)
+      000420 11 18 80         [10]  811 	ld	de, #0x8018
+      000423 29               [11]  812 	add	hl, hl
+      000424 3F               [ 4]  813 	ccf
+      000425 CB 1C            [ 8]  814 	rr	h
+      000427 CB 1D            [ 8]  815 	rr	l
+      000429 ED 52            [15]  816 	sbc	hl, de
+      00042B 30 03            [12]  817 	jr	NC, 00102$
+                                    818 ;main.c:184: camera.scroll_y++;
+      00042D 0A               [ 7]  819 	ld	a, (bc)
+      00042E 3C               [ 4]  820 	inc	a
+      00042F 02               [ 7]  821 	ld	(bc), a
+      000430                        822 00102$:
+                                    823 ;main.c:187: if (camera.scroll_y > 223) //We need to reset the scroll_y to prevent it from hitching the screen, from overflow.
+      000430 0A               [ 7]  824 	ld	a, (bc)
+      000431 5F               [ 4]  825 	ld	e, a
+      000432 3E DF            [ 7]  826 	ld	a, #0xdf
+      000434 93               [ 4]  827 	sub	a, e
+      000435 30 02            [12]  828 	jr	NC, 00104$
+                                    829 ;main.c:189: camera.scroll_y = 0;
+      000437 AF               [ 4]  830 	xor	a, a
+      000438 02               [ 7]  831 	ld	(bc), a
+      000439                        832 00104$:
+                                    833 ;main.c:180: camera.rowoffset = 28 - (camera.scroll_y/8); //Get the position of the y scroll register in tiles.
+      000439 0A               [ 7]  834 	ld	a, (bc)
+                                    835 ;main.c:192: if (camera.scroll_y % 8 == 0 && camera.view_y < 24) //Time to update the row with tiles. Happens every 1 tile of scrolling. 8 x 8 pixels = 1 tile.
+      00043A 4F               [ 4]  836 	ld	c, a
+      00043B 06 00            [ 7]  837 	ld	b, #0x00
+      00043D 79               [ 4]  838 	ld	a, c
+      00043E E6 07            [ 7]  839 	and	a, #0x07
+      000440 C2r06r05         [10]  840 	jp	NZ,00110$
+      000443 2Ar02r00         [16]  841 	ld	hl, (#(_camera + 2) + 0)
+      000446 11 18 80         [10]  842 	ld	de, #0x8018
+      000449 29               [11]  843 	add	hl, hl
+      00044A 3F               [ 4]  844 	ccf
+      00044B CB 1C            [ 8]  845 	rr	h
+      00044D CB 1D            [ 8]  846 	rr	l
+      00044F ED 52            [15]  847 	sbc	hl, de
+      000451 D2r06r05         [10]  848 	jp	NC, 00110$
+                                    849 ;main.c:195: camera.rowoffset = (camera.scroll_y / 8) - 1;
+      000454 CB 28            [ 8]  850 	sra	b
+      000456 CB 19            [ 8]  851 	rr	c
+      000458 CB 28            [ 8]  852 	sra	b
+      00045A CB 19            [ 8]  853 	rr	c
+      00045C CB 28            [ 8]  854 	sra	b
+      00045E CB 19            [ 8]  855 	rr	c
+      000460 0B               [ 6]  856 	dec	bc
+      000461 ED 43r08r00      [20]  857 	ld	((_camera + 8)), bc
+                                    858 ;main.c:197: unsigned char coloffset = camera.coloffset; //Save the last state of coloffset in a temp variable.
+      000465 21r06r00         [10]  859 	ld	hl, #_camera + 6
+      000468 4E               [ 7]  860 	ld	c, (hl)
+                                    861 ;main.c:198: unsigned char xdex = 0; //We store the current x loop position, in order to subtract from the loop, to start at zero again when at last tile position.
+      000469 DD 36 FC 00      [19]  862 	ld	-4 (ix), #0x00
+                                    863 ;main.c:200: for (unsigned char x = 0; x < 32; x ++)
+      00046D DD 36 FF 00      [19]  864 	ld	-1 (ix), #0x00
+      000471                        865 00115$:
+                                    866 ;main.c:182: if (camera.view_y < 24) //Prvent the scrolling from going past the height of the map. 24 tiles = 192 pixels
+      000471 21r02r00         [10]  867 	ld	hl, #(_camera + 2)
+      000474 7E               [ 7]  868 	ld	a, (hl)
+      000475 DD 77 FD         [19]  869 	ld	-3 (ix), a
+      000478 23               [ 6]  870 	inc	hl
+      000479 7E               [ 7]  871 	ld	a, (hl)
+      00047A DD 77 FE         [19]  872 	ld	-2 (ix), a
+                                    873 ;main.c:200: for (unsigned char x = 0; x < 32; x ++)
+      00047D DD 7E FF         [19]  874 	ld	a, -1 (ix)
+      000480 D6 20            [ 7]  875 	sub	a, #0x20
+      000482 30 77            [12]  876 	jr	NC, 00108$
+                                    877 ;main.c:202: if (x >= 32 - coloffset && coloffset != 0)//When screen is offset, as the loop reaches the edge of the screen, we need to reset the loop so it begins at zero to finish off tiling.
+      000484 59               [ 4]  878 	ld	e, c
+      000485 16 00            [ 7]  879 	ld	d, #0x00
+      000487 21 20 00         [10]  880 	ld	hl, #0x0020
+      00048A BF               [ 4]  881 	cp	a, a
+      00048B ED 52            [15]  882 	sbc	hl, de
+      00048D DD 5E FF         [19]  883 	ld	e, -1 (ix)
+      000490 16 00            [ 7]  884 	ld	d, #0x00
+      000492 7B               [ 4]  885 	ld	a, e
+      000493 95               [ 4]  886 	sub	a, l
+      000494 7A               [ 4]  887 	ld	a, d
+      000495 9C               [ 4]  888 	sbc	a, h
+      000496 E2r9Br04         [10]  889 	jp	PO, 00191$
+      000499 EE 80            [ 7]  890 	xor	a, #0x80
+      00049B                        891 00191$:
+      00049B FArAAr04         [10]  892 	jp	M, 00106$
+      00049E 79               [ 4]  893 	ld	a, c
+      00049F B7               [ 4]  894 	or	a, a
+      0004A0 28 08            [12]  895 	jr	Z, 00106$
+                                    896 ;main.c:204: coloffset = 0; //removes the offset from the equation. we need to start at zero.
+      0004A2 0E 00            [ 7]  897 	ld	c, #0x00
+                                    898 ;main.c:205: xdex = x; //store the x loop current index, to subtract it.
+      0004A4 DD 7E FF         [19]  899 	ld	a, -1 (ix)
+      0004A7 DD 77 FC         [19]  900 	ld	-4 (ix), a
+      0004AA                        901 00106$:
+                                    902 ;main.c:207: SMS_loadTileMap(coloffset + (x - xdex),camera.rowoffset,brawl_street_tilemap_bin + (camera.view_x + (x * 2)) + (((camera.view_y + 28) * 96) * 2),2);
+      0004AA 2Ar00r00         [16]  903 	ld	hl, (#_camera + 0)
+      0004AD EB               [ 4]  904 	ex	de, hl
+      0004AE 29               [11]  905 	add	hl, hl
+      0004AF EB               [ 4]  906 	ex	de, hl
+      0004B0 19               [11]  907 	add	hl, de
+      0004B1 EB               [ 4]  908 	ex	de, hl
+      0004B2 21r00r00         [10]  909 	ld	hl, #_brawl_street_tilemap_bin
+      0004B5 19               [11]  910 	add	hl, de
+      0004B6 EB               [ 4]  911 	ex	de, hl
+      0004B7 DD 7E FD         [19]  912 	ld	a, -3 (ix)
+      0004BA C6 1C            [ 7]  913 	add	a, #0x1c
+      0004BC 6F               [ 4]  914 	ld	l, a
+                                    915 ;	spillPairReg hl
+                                    916 ;	spillPairReg hl
+      0004BD DD 7E FE         [19]  917 	ld	a, -2 (ix)
+      0004C0 CE 00            [ 7]  918 	adc	a, #0x00
+      0004C2 67               [ 4]  919 	ld	h, a
+                                    920 ;	spillPairReg hl
+                                    921 ;	spillPairReg hl
+      0004C3 D5               [11]  922 	push	de
+      0004C4 5D               [ 4]  923 	ld	e, l
+      0004C5 54               [ 4]  924 	ld	d, h
+      0004C6 29               [11]  925 	add	hl, hl
+      0004C7 19               [11]  926 	add	hl, de
+      0004C8 29               [11]  927 	add	hl, hl
+      0004C9 29               [11]  928 	add	hl, hl
+      0004CA 29               [11]  929 	add	hl, hl
+      0004CB 29               [11]  930 	add	hl, hl
+      0004CC 29               [11]  931 	add	hl, hl
+      0004CD 29               [11]  932 	add	hl, hl
+      0004CE D1               [10]  933 	pop	de
+      0004CF 19               [11]  934 	add	hl, de
+      0004D0 EB               [ 4]  935 	ex	de, hl
+      0004D1 2Ar08r00         [16]  936 	ld	hl, (#(_camera + 8) + 0)
+      0004D4 29               [11]  937 	add	hl, hl
+      0004D5 29               [11]  938 	add	hl, hl
+      0004D6 29               [11]  939 	add	hl, hl
+      0004D7 29               [11]  940 	add	hl, hl
+      0004D8 29               [11]  941 	add	hl, hl
+      0004D9 DD 7E FF         [19]  942 	ld	a, -1 (ix)
+      0004DC DD 96 FC         [19]  943 	sub	a, -4 (ix)
+      0004DF 81               [ 4]  944 	add	a, c
+      0004E0 06 00            [ 7]  945 	ld	b, #0x00
+      0004E2 85               [ 4]  946 	add	a, l
+      0004E3 6F               [ 4]  947 	ld	l, a
+                                    948 ;	spillPairReg hl
+                                    949 ;	spillPairReg hl
+      0004E4 78               [ 4]  950 	ld	a, b
+      0004E5 8C               [ 4]  951 	adc	a, h
+      0004E6 67               [ 4]  952 	ld	h, a
+                                    953 ;	spillPairReg hl
+                                    954 ;	spillPairReg hl
+      0004E7 29               [11]  955 	add	hl, hl
+      0004E8 7C               [ 4]  956 	ld	a, h
+      0004E9 F6 78            [ 7]  957 	or	a, #0x78
+      0004EB 67               [ 4]  958 	ld	h, a
+                                    959 ;	spillPairReg hl
+                                    960 ;	spillPairReg hl
+      0004EC C5               [11]  961 	push	bc
+      0004ED 01 02 00         [10]  962 	ld	bc, #0x0002
+      0004F0 C5               [11]  963 	push	bc
+      0004F1 CDr00r00         [17]  964 	call	_SMS_VRAMmemcpy
+      0004F4 C1               [10]  965 	pop	bc
+                                    966 ;main.c:200: for (unsigned char x = 0; x < 32; x ++)
+      0004F5 DD 34 FF         [23]  967 	inc	-1 (ix)
+      0004F8 C3r71r04         [10]  968 	jp	00115$
+      0004FB                        969 00108$:
+                                    970 ;main.c:211: camera.view_y++; //Increase the view_y by 1.
+      0004FB DD 4E FD         [19]  971 	ld	c, -3 (ix)
+      0004FE DD 46 FE         [19]  972 	ld	b, -2 (ix)
+      000501 03               [ 6]  973 	inc	bc
+      000502 ED 43r02r00      [20]  974 	ld	((_camera + 2)), bc
+      000506                        975 00110$:
+                                    976 ;main.c:213: if (camera.rowoffset == 28) //Reset rowoffset because the nametable(the tilemap table in VRAM) only has 28 tiles in height (256 x 224. the 32 extra pixels in height is cropped in NTSC resolution..)
+      000506 2Ar08r00         [16]  977 	ld	hl, (#(_camera + 8) + 0)
+      000509 7D               [ 4]  978 	ld	a, l
+      00050A D6 1C            [ 7]  979 	sub	a, #0x1c
+      00050C B4               [ 4]  980 	or	a, h
+      00050D 20 06            [12]  981 	jr	NZ, 00117$
+                                    982 ;main.c:215: camera.rowoffset = 0;
+      00050F 21 00 00         [10]  983 	ld	hl, #0x0000
+      000512 22r08r00         [16]  984 	ld	((_camera + 8)), hl
+      000515                        985 00117$:
+                                    986 ;main.c:218: }
+      000515 DD F9            [10]  987 	ld	sp, ix
+      000517 DD E1            [14]  988 	pop	ix
+      000519 C9               [10]  989 	ret
+                                    990 ;main.c:222: void main(void)
+                                    991 ;	---------------------------------
+                                    992 ; Function main
+                                    993 ; ---------------------------------
+      00051A                        994 _main::
+                                    995 ;main.c:225: SMS_displayOff();
+      00051A 21 40 01         [10]  996 	ld	hl, #0x0140
+      00051D CDr00r00         [17]  997 	call	_SMS_VDPturnOffFeature
+                                    998 ;main.c:228: SMS_VRAMmemsetW(0, 0x0000, 16384);
+      000520 21 00 40         [10]  999 	ld	hl, #0x4000
+      000523 E5               [11] 1000 	push	hl
+      000524 11 00 00         [10] 1001 	ld	de, #0x0000
+      000527 65               [ 4] 1002 	ld	h, l
+      000528 CDr00r00         [17] 1003 	call	_SMS_VRAMmemsetW
+                                   1004 ;main.c:229: SMS_zeroBGPalette();
+      00052B CDr00r00         [17] 1005 	call	_SMS_zeroBGPalette
+                                   1006 ;main.c:230: SMS_zeroSpritePalette();
+      00052E CDr00r00         [17] 1007 	call	_SMS_zeroSpritePalette
+                                   1008 ;main.c:233: SMS_VDPturnOnFeature(VDPFEATURE_LEFTCOLBLANK);
+      000531 21 20 00         [10] 1009 	ld	hl, #0x0020
+      000534 CDr00r00         [17] 1010 	call	_SMS_VDPturnOnFeature
+                                   1011 ;main.c:234: SMS_VDPturnOnFeature(VDPFEATURE_HIDEFIRSTCOL);
+      000537 21 20 00         [10] 1012 	ld	hl, #0x0020
+      00053A CDr00r00         [17] 1013 	call	_SMS_VDPturnOnFeature
+                                   1014 ;main.c:237: SMS_mapROMBank(bg_pal_bin_bank);
+      00053D 21 FF FF         [10] 1015 	ld	hl, #_ROM_bank_to_be_mapped_on_slot2
+      000540 36 03            [10] 1016 	ld	(hl), #0x03
+                                   1017 ;main.c:238: SMS_loadBGPalette(bg_pal_bin);
+      000542 21r00r00         [10] 1018 	ld	hl, #_bg_pal_bin
+      000545 CDr00r00         [17] 1019 	call	_SMS_loadBGPalette
+                                   1020 ;main.c:239: SMS_loadSpritePalette(spr_pal_bin);
+      000548 21r00r00         [10] 1021 	ld	hl, #_spr_pal_bin
+      00054B CDr00r00         [17] 1022 	call	_SMS_loadSpritePalette
+                                   1023 ;main.c:242: SMS_setBackdropColor(15);
+      00054E 2E 0F            [ 7] 1024 	ld	l, #0x0f
+                                   1025 ;	spillPairReg hl
+                                   1026 ;	spillPairReg hl
+      000550 CDr00r00         [17] 1027 	call	_SMS_setBackdropColor
+                                   1028 ;main.c:245: SMS_loadPSGaidencompressedTiles(font_8x8_psgcompr,192);
+      000553 11 00 58         [10] 1029 	ld	de, #0x5800
+      000556 21r00r00         [10] 1030 	ld	hl, #_font_8x8_psgcompr
+      000559 CDr00r00         [17] 1031 	call	_SMS_loadPSGaidencompressedTilesatAddr
+                                   1032 ;main.c:246: SMS_configureTextRenderer(160);
+      00055C 21 A0 00         [10] 1033 	ld	hl, #0x00a0
+      00055F CDr00r00         [17] 1034 	call	_SMS_configureTextRenderer
+                                   1035 ;main.c:250: SMS_mapROMBank(brawl_street_tiles_psgcompr_bank);
+      000562 21 FF FF         [10] 1036 	ld	hl, #_ROM_bank_to_be_mapped_on_slot2
+      000565 36 03            [10] 1037 	ld	(hl), #0x03
+                                   1038 ;main.c:251: SMS_loadPSGaidencompressedTiles(brawl_street_tiles_psgcompr,0);
+      000567 11 00 40         [10] 1039 	ld	de, #0x4000
+      00056A 21r00r00         [10] 1040 	ld	hl, #_brawl_street_tiles_psgcompr
+      00056D CDr00r00         [17] 1041 	call	_SMS_loadPSGaidencompressedTilesatAddr
+                                   1042 ;main.c:255: init_camera();
+      000570 CDr00r00         [17] 1043 	call	_init_camera
+                                   1044 ;main.c:256: redraw_stage(); //Draw map at current view position.
+      000573 CDr28r00         [17] 1045 	call	_redraw_stage
+                                   1046 ;main.c:259: SMS_displayOn();
+      000576 21 40 01         [10] 1047 	ld	hl, #0x0140
+      000579 CDr00r00         [17] 1048 	call	_SMS_VDPturnOnFeature
+      00057C                       1049 00110$:
+                                   1050 ;main.c:266: if (SMS_getKeysHeld() & PORT_A_KEY_RIGHT)
+      00057C CDr00r00         [17] 1051 	call	_SMS_getKeysHeld
+      00057F CB 5B            [ 8] 1052 	bit	3, e
+      000581 28 03            [12] 1053 	jr	Z, 00102$
+                                   1054 ;main.c:269: cam_pan_right();
+      000583 CDr6Ar00         [17] 1055 	call	_cam_pan_right
+      000586                       1056 00102$:
+                                   1057 ;main.c:271: if (SMS_getKeysHeld() & PORT_A_KEY_LEFT)
+      000586 CDr00r00         [17] 1058 	call	_SMS_getKeysHeld
+      000589 CB 53            [ 8] 1059 	bit	2, e
+      00058B 28 03            [12] 1060 	jr	Z, 00104$
+                                   1061 ;main.c:274: cam_pan_left();
+      00058D CDrA9r01         [17] 1062 	call	_cam_pan_left
+      000590                       1063 00104$:
+                                   1064 ;main.c:276: if (SMS_getKeysHeld() & PORT_A_KEY_UP)
+      000590 CDr00r00         [17] 1065 	call	_SMS_getKeysHeld
+      000593 CB 43            [ 8] 1066 	bit	0, e
+      000595 28 03            [12] 1067 	jr	Z, 00106$
+                                   1068 ;main.c:278: cam_pan_up();
+      000597 CDrCAr02         [17] 1069 	call	_cam_pan_up
+      00059A                       1070 00106$:
+                                   1071 ;main.c:280: if (SMS_getKeysHeld() & PORT_A_KEY_DOWN)
+      00059A CDr00r00         [17] 1072 	call	_SMS_getKeysHeld
+      00059D CB 4B            [ 8] 1073 	bit	1, e
+      00059F 28 03            [12] 1074 	jr	Z, 00108$
+                                   1075 ;main.c:282: cam_pan_down();
+      0005A1 CDrF5r03         [17] 1076 	call	_cam_pan_down
+      0005A4                       1077 00108$:
+                                   1078 ;main.c:284: SMS_waitForVBlank();
+      0005A4 CDr00r00         [17] 1079 	call	_SMS_waitForVBlank
+                                   1080 ;main.c:286: SMS_setBGScrollX(camera.scroll_x);
+      0005A7 21r04r00         [10] 1081 	ld	hl, #_camera + 4
+      0005AA 6E               [ 7] 1082 	ld	l, (hl)
+                                   1083 ;	spillPairReg hl
+      0005AB CDr00r00         [17] 1084 	call	_SMS_setBGScrollX
+                                   1085 ;main.c:287: SMS_setBGScrollY(camera.scroll_y);
+      0005AE 21r05r00         [10] 1086 	ld	hl, #_camera + 5
+      0005B1 6E               [ 7] 1087 	ld	l, (hl)
+                                   1088 ;	spillPairReg hl
+      0005B2 CDr00r00         [17] 1089 	call	_SMS_setBGScrollY
+                                   1090 ;main.c:288: SMS_initSprites();
+      0005B5 CDr00r00         [17] 1091 	call	_SMS_initSprites
+                                   1092 ;main.c:290: SMS_copySpritestoSAT();
+      0005B8 CDr00r00         [17] 1093 	call	_SMS_copySpritestoSAT
+                                   1094 ;main.c:293: }
+      0005BB 18 BF            [12] 1095 	jr	00110$
+                                   1096 	.area _CODE
+      0005BD                       1097 __str_0:
+      0005BD 4F 72 61 6E 67 65 52  1098 	.ascii "OrangeRevolt"
              65 76 6F 6C 74
-      000B34 00                    1967 	.db 0x00
-      000B35                       1968 __str_1:
-      000B35 53 63 72 6F 6C 6C 69  1969 	.ascii "Scrolling"
+      0005C9 00                    1099 	.db 0x00
+      0005CA                       1100 __str_1:
+      0005CA 53 63 72 6F 6C 6C 69  1101 	.ascii "Scrolling"
              6E 67
-      000B3E 00                    1970 	.db 0x00
-      000B3F                       1971 __str_2:
-      000B3F 38 20 77 61 79 20 73  1972 	.ascii "8 way smooth scrolling example."
+      0005D3 00                    1102 	.db 0x00
+      0005D4                       1103 __str_2:
+      0005D4 38 20 77 61 79 20 73  1104 	.ascii "8 way smooth scrolling example."
              6D 6F 6F 74 68 20 73
              63 72 6F 6C 6C 69 6E
              67 20 65 78 61 6D 70
              6C 65 2E
-      000B5E 00                    1973 	.db 0x00
-                                   1974 	.area _INITIALIZER
-      000000                       1975 __xinit__order_time:
-      000000 00 00                 1976 	.dw #0x0000
-                                   1977 	.area _CABS (ABS)
-      007FF0                       1978 	.org 0x7FF0
-      007FF0                       1979 ___SMS__SEGA_signature:
-      007FF0 54                    1980 	.db #0x54	; 84	'T'
-      007FF1 4D                    1981 	.db #0x4d	; 77	'M'
-      007FF2 52                    1982 	.db #0x52	; 82	'R'
-      007FF3 20                    1983 	.db #0x20	; 32
-      007FF4 53                    1984 	.db #0x53	; 83	'S'
-      007FF5 45                    1985 	.db #0x45	; 69	'E'
-      007FF6 47                    1986 	.db #0x47	; 71	'G'
-      007FF7 41                    1987 	.db #0x41	; 65	'A'
-      007FF8 FF                    1988 	.db #0xff	; 255
-      007FF9 FF                    1989 	.db #0xff	; 255
-      007FFA FF                    1990 	.db #0xff	; 255
-      007FFB FF                    1991 	.db #0xff	; 255
-      007FFC 99                    1992 	.db #0x99	; 153
-      007FFD 99                    1993 	.db #0x99	; 153
-      007FFE 00                    1994 	.db #0x00	; 0
-      007FFF 4C                    1995 	.db #0x4c	; 76	'L'
-      007FD3                       1996 	.org 0x7FD3
-      007FD3                       1997 ___SMS__SDSC_author:
-      007FD3 4F 72 61 6E 67 65 52  1998 	.ascii "OrangeRevolt"
+      0005F3 00                    1105 	.db 0x00
+                                   1106 	.area _INITIALIZER
+                                   1107 	.area _CABS (ABS)
+      007FF0                       1108 	.org 0x7FF0
+      007FF0                       1109 ___SMS__SEGA_signature:
+      007FF0 54                    1110 	.db #0x54	; 84	'T'
+      007FF1 4D                    1111 	.db #0x4d	; 77	'M'
+      007FF2 52                    1112 	.db #0x52	; 82	'R'
+      007FF3 20                    1113 	.db #0x20	; 32
+      007FF4 53                    1114 	.db #0x53	; 83	'S'
+      007FF5 45                    1115 	.db #0x45	; 69	'E'
+      007FF6 47                    1116 	.db #0x47	; 71	'G'
+      007FF7 41                    1117 	.db #0x41	; 65	'A'
+      007FF8 FF                    1118 	.db #0xff	; 255
+      007FF9 FF                    1119 	.db #0xff	; 255
+      007FFA FF                    1120 	.db #0xff	; 255
+      007FFB FF                    1121 	.db #0xff	; 255
+      007FFC 99                    1122 	.db #0x99	; 153
+      007FFD 99                    1123 	.db #0x99	; 153
+      007FFE 00                    1124 	.db #0x00	; 0
+      007FFF 4C                    1125 	.db #0x4c	; 76	'L'
+      007FD3                       1126 	.org 0x7FD3
+      007FD3                       1127 ___SMS__SDSC_author:
+      007FD3 4F 72 61 6E 67 65 52  1128 	.ascii "OrangeRevolt"
              65 76 6F 6C 74
-      007FDF 00                    1999 	.db 0x00
-      007FC9                       2000 	.org 0x7FC9
-      007FC9                       2001 ___SMS__SDSC_name:
-      007FC9 53 63 72 6F 6C 6C 69  2002 	.ascii "Scrolling"
+      007FDF 00                    1129 	.db 0x00
+      007FC9                       1130 	.org 0x7FC9
+      007FC9                       1131 ___SMS__SDSC_name:
+      007FC9 53 63 72 6F 6C 6C 69  1132 	.ascii "Scrolling"
              6E 67
-      007FD2 00                    2003 	.db 0x00
-      007FA9                       2004 	.org 0x7FA9
-      007FA9                       2005 ___SMS__SDSC_descr:
-      007FA9 38 20 77 61 79 20 73  2006 	.ascii "8 way smooth scrolling example."
+      007FD2 00                    1133 	.db 0x00
+      007FA9                       1134 	.org 0x7FA9
+      007FA9                       1135 ___SMS__SDSC_descr:
+      007FA9 38 20 77 61 79 20 73  1136 	.ascii "8 way smooth scrolling example."
              6D 6F 6F 74 68 20 73
              63 72 6F 6C 6C 69 6E
              67 20 65 78 61 6D 70
              6C 65 2E
-      007FC8 00                    2007 	.db 0x00
-      007FE0                       2008 	.org 0x7FE0
-      007FE0                       2009 ___SMS__SDSC_signature:
-      007FE0 53                    2010 	.db #0x53	; 83	'S'
-      007FE1 44                    2011 	.db #0x44	; 68	'D'
-      007FE2 53                    2012 	.db #0x53	; 83	'S'
-      007FE3 43                    2013 	.db #0x43	; 67	'C'
-      007FE4 01                    2014 	.db #0x01	; 1
-      007FE5 00                    2015 	.db #0x00	; 0
-      007FE6 00                    2016 	.db #0x00	; 0
-      007FE7 00                    2017 	.db #0x00	; 0
-      007FE8 00                    2018 	.db #0x00	; 0
-      007FE9 00                    2019 	.db #0x00	; 0
-      007FEA D3                    2020 	.db #0xd3	; 211
-      007FEB 7F                    2021 	.db #0x7f	; 127
-      007FEC C9                    2022 	.db #0xc9	; 201
-      007FED 7F                    2023 	.db #0x7f	; 127
-      007FEE A9                    2024 	.db #0xa9	; 169
-      007FEF 7F                    2025 	.db #0x7f	; 127
+      007FC8 00                    1137 	.db 0x00
+      007FE0                       1138 	.org 0x7FE0
+      007FE0                       1139 ___SMS__SDSC_signature:
+      007FE0 53                    1140 	.db #0x53	; 83	'S'
+      007FE1 44                    1141 	.db #0x44	; 68	'D'
+      007FE2 53                    1142 	.db #0x53	; 83	'S'
+      007FE3 43                    1143 	.db #0x43	; 67	'C'
+      007FE4 01                    1144 	.db #0x01	; 1
+      007FE5 00                    1145 	.db #0x00	; 0
+      007FE6 00                    1146 	.db #0x00	; 0
+      007FE7 00                    1147 	.db #0x00	; 0
+      007FE8 00                    1148 	.db #0x00	; 0
+      007FE9 00                    1149 	.db #0x00	; 0
+      007FEA D3                    1150 	.db #0xd3	; 211
+      007FEB 7F                    1151 	.db #0x7f	; 127
+      007FEC C9                    1152 	.db #0xc9	; 201
+      007FED 7F                    1153 	.db #0x7f	; 127
+      007FEE A9                    1154 	.db #0xa9	; 169
+      007FEF 7F                    1155 	.db #0x7f	; 127
